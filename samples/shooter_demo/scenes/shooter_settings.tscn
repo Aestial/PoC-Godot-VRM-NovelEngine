@@ -1,0 +1,130 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://samples/shooter_demo/scripts/ui/shooter_settings.gd" id="1_set"]
+
+[node name="ShooterSettings" type="CanvasLayer"]
+script = ExtResource("1_set")
+
+[node name="Panel" type="PanelContainer" parent="."]
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -240.0
+offset_top = -220.0
+offset_right = 240.0
+offset_bottom = 220.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+
+[node name="Margin" type="MarginContainer" parent="Panel"]
+layout_mode = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 16
+
+[node name="VBox" type="VBoxContainer" parent="Panel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Title" type="Label" parent="Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+text = "Settings (ESC)"
+horizontal_alignment = 1
+
+[node name="RowDistance" type="HBoxContainer" parent="Panel/Margin/VBox"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Panel/Margin/VBox/RowDistance"]
+layout_mode = 2
+custom_minimum_size = Vector2(130, 0)
+text = "Camera distance"
+
+[node name="Slider" type="HSlider" parent="Panel/Margin/VBox/RowDistance"]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 0.6
+max_value = 6.0
+step = 0.05
+value = 2.4
+
+[node name="Value" type="Label" parent="Panel/Margin/VBox/RowDistance"]
+layout_mode = 2
+custom_minimum_size = Vector2(80, 0)
+text = "2.4 m"
+horizontal_alignment = 2
+
+[node name="RowShoulder" type="HBoxContainer" parent="Panel/Margin/VBox"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Panel/Margin/VBox/RowShoulder"]
+layout_mode = 2
+custom_minimum_size = Vector2(130, 0)
+text = "Shoulder offset"
+
+[node name="Slider" type="HSlider" parent="Panel/Margin/VBox/RowShoulder"]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = -1.5
+max_value = 1.5
+step = 0.05
+value = 0.35
+
+[node name="Value" type="Label" parent="Panel/Margin/VBox/RowShoulder"]
+layout_mode = 2
+custom_minimum_size = Vector2(80, 0)
+text = "0.35"
+horizontal_alignment = 2
+
+[node name="RowSens" type="HBoxContainer" parent="Panel/Margin/VBox"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Panel/Margin/VBox/RowSens"]
+layout_mode = 2
+custom_minimum_size = Vector2(130, 0)
+text = "Mouse sensitivity"
+
+[node name="Slider" type="HSlider" parent="Panel/Margin/VBox/RowSens"]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 0.0005
+max_value = 0.02
+step = 0.0005
+value = 0.005
+
+[node name="Value" type="Label" parent="Panel/Margin/VBox/RowSens"]
+layout_mode = 2
+custom_minimum_size = Vector2(80, 0)
+text = "0.005"
+horizontal_alignment = 2
+
+[node name="RowAdsFov" type="HBoxContainer" parent="Panel/Margin/VBox"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Panel/Margin/VBox/RowAdsFov"]
+layout_mode = 2
+custom_minimum_size = Vector2(130, 0)
+text = "ADS FOV"
+
+[node name="Slider" type="HSlider" parent="Panel/Margin/VBox/RowAdsFov"]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 30.0
+max_value = 80.0
+step = 1.0
+value = 42.0
+
+[node name="Value" type="Label" parent="Panel/Margin/VBox/RowAdsFov"]
+layout_mode = 2
+custom_minimum_size = Vector2(80, 0)
+text = "42 fov"
+horizontal_alignment = 2
+
+[node name="Resume" type="Button" parent="Panel/Margin/VBox"]
+layout_mode = 2
+text = "Resume (ESC)"

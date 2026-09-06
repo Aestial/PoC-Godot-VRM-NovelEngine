@@ -19,6 +19,9 @@ signal downed(target: Node)
 @export var move_amplitude: float = 5.0
 @export var move_speed: float = 0.6 # rad/s of the sine
 
+## Wound FX: plasma/blood burst color leaking from each bullet hole.
+@export var plasma_color: Color = Color(0.85, 0.12, 0.18)
+
 @onready var _health: Health = $Health
 @onready var _visual: MeshInstance3D = $Visual
 @onready var _body: StaticBody3D = $Body
@@ -51,7 +54,37 @@ func _physics_process(delta: float) -> void:
 func _on_damaged(amount: int, hit: Dictionary) -> void:
 	_flash()
 	var pos: Vector3 = hit.get("position", global_position + Vector3.UP)
+	_spawn_wound_plasma(pos, hit.get("normal", Vector3.UP))
 	FxBank.popup(get_tree().current_scene, pos, "-%d" % amount, Color(1.0, 0.25, 0.25))
+
+
+## One-shot CPU particles bursting out of the wound, then dripping down with
+## gravity. Parented to the target so the leak follows moving targets.
+func _spawn_wound_plasma(world_pos: Vector3, world_normal: Vector3) -> void:
+	var particles := CPUParticles3D.new()
+	particles.name = "WoundPlasma"
+	particles.one_shot = true
+	particles.emitting = true
+	particles.amount = 16
+	particles.lifetime = 0.8
+	particles.explosiveness = 1.0
+	particles.direction = world_normal.normalized()
+	particles.spread = 55.0
+	particles.initial_velocity_min = 1.2
+	particles.initial_velocity_max = 2.6
+	particles.gravity = Vector3(0, -5.0, 0)
+	particles.scale_amount_min = 0.02
+	particles.scale_amount_max = 0.05
+	var mat := StandardMaterial3D.new()
+	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	mat.albedo_color = Color(plasma_color.r, plasma_color.g, plasma_color.b, 0.9)
+	particles.material_override = mat
+	add_child(particles)
+	particles.global_position = world_pos
+	var tween := particles.create_tween()
+	tween.tween_interval(1.2)
+	tween.tween_callback(particles.queue_free)
 
 
 func _on_died(hit: Dictionary) -> void:

@@ -8,6 +8,7 @@
 [ext_resource type="PackedScene" path="res://samples/shooter_demo/scenes/target_dummy.tscn" id="6_dummy"]
 [ext_resource type="PackedScene" path="res://samples/shooter_demo/scenes/prop_crate.tscn" id="7_crate"]
 [ext_resource type="Script" uid="uid://cuqj7p44stre8" path="res://samples/shooter_demo/scripts/combat/score_keeper.gd" id="8_sk"]
+[ext_resource type="PackedScene" path="res://samples/shooter_demo/scenes/shooter_settings.tscn" id="9_settings"]
 
 [sub_resource type="PanoramaSkyMaterial" id="sky_mat"]
 panorama = ExtResource("5_sky")
@@ -47,7 +48,7 @@ shadow_enabled = true
 
 [node name="Player" parent="Characters" unique_id=1780186129 instance=ExtResource("2_player")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 12)
-default_pose_amount = 1.0
+default_pose_name = "reset"
 
 [node name="Controllers" type="Node" parent="." unique_id=675341838]
 script = ExtResource("4_ptr")
@@ -162,3 +163,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.5, 0.5, -15.5)
 
 [node name="ScoreKeeper" type="Node" parent="." unique_id=1387979363]
 script = ExtResource("8_sk")
+
+[node name="Settings" parent="." instance=ExtResource("9_settings")]
+player_path = NodePath("../Characters/Player")

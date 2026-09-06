@@ -1,8 +1,8 @@
-[gd_resource type="AnimationNodeBlendTree" format=3 uid="uid://dgubwui2tiafd"]
+[gd_resource type="AnimationNodeBlendTree" format=3 uid="uid://dx2b4jcb4wi7y"]
 
 [ext_resource type="AnimationNodeBlendSpace2D" uid="uid://b8y7ptxnl4w76" path="res://visual-novel/animations/face-emotions_blend-space2d.tres" id="1_rfivk"]
 [ext_resource type="AnimationNodeBlendTree" uid="uid://cqttxdeqj08lr" path="res://visual-novel/animations/face-animation_blendtree.res" id="2_jnvbf"]
-[ext_resource type="AnimationNodeStateMachine" uid="uid://b7ylgyss6jgi2" path="res://visual-novel/animations/basic-locomotion_state-machine.tres" id="3_1c22v"]
+[ext_resource type="AnimationNodeStateMachine" uid="uid://yn8bxnopm6tc" path="res://visual-novel/animations/rifle-locomotion_state-machine.tres" id="3_1c22v"]
 
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_wylqr"]
 animation = &"basic-dancing_library/Shuffling"
@@ -68,27 +68,34 @@ value_label = "0"
 
 [sub_resource type="AnimationNodeBlend2" id="AnimationNodeBlend2_rfivk"]
 
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_7w10x"]
+animation = &"rifle-shooting-mvc/Rifle Idle"
+
 [sub_resource type="AnimationNodeTransition" id="AnimationNodeTransition_jnvbf"]
-input_0/name = "idle"
+input_0/name = "reset"
 input_0/auto_advance = false
 input_0/break_loop_at_end = false
 input_0/reset = true
-input_1/name = "crying"
+input_1/name = "idle"
 input_1/auto_advance = false
 input_1/break_loop_at_end = false
 input_1/reset = true
-input_2/name = "dancing"
+input_2/name = "crying"
 input_2/auto_advance = false
 input_2/break_loop_at_end = false
 input_2/reset = true
-input_3/name = "metro_standing"
+input_3/name = "dancing"
 input_3/auto_advance = false
 input_3/break_loop_at_end = false
 input_3/reset = true
-input_4/name = "sitting"
+input_4/name = "metro_standing"
 input_4/auto_advance = false
 input_4/break_loop_at_end = false
 input_4/reset = true
+input_5/name = "sitting"
+input_5/auto_advance = false
+input_5/break_loop_at_end = false
+input_5/reset = true
 
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_jnvbf"]
 animation = &"RESET"
@@ -134,12 +141,12 @@ input_3/break_loop_at_end = false
 input_3/reset = true
 
 [resource]
-graph_offset = Vector2(134.57056, -208.1516)
+graph_offset = Vector2(-110.49542, -378.9713)
 nodes/output/position = Vector2(1640, 100)
 nodes/BaseEmotion/node = ExtResource("1_rfivk")
 nodes/BaseEmotion/position = Vector2(300, 140)
 nodes/Locomotion/node = ExtResource("3_1c22v")
-nodes/Locomotion/position = Vector2(540, -560)
+nodes/Locomotion/position = Vector2(520, -300)
 nodes/FaceAdd/node = SubResource("AnimationNodeAdd2_w1isf")
 nodes/FaceAdd/position = Vector2(1440, 60)
 nodes/FaceExpression/node = ExtResource("2_jnvbf")
@@ -159,9 +166,9 @@ nodes/LeftBlink/position = Vector2(300, 620)
 nodes/RightBlink/node = SubResource("AnimationNodeBlendSpace1D_xp6r4")
 nodes/RightBlink/position = Vector2(300, 820)
 nodes/LocomotionBlend/node = SubResource("AnimationNodeBlend2_rfivk")
-nodes/LocomotionBlend/position = Vector2(920, -380)
+nodes/LocomotionBlend/position = Vector2(880, -480)
 nodes/Pose/node = SubResource("AnimationNodeTransition_jnvbf")
-nodes/Pose/position = Vector2(280, -400)
+nodes/Pose/position = Vector2(280, -420)
 nodes/Crying/node = SubResource("AnimationNodeAnimation_rfivk")
 nodes/Crying/position = Vector2(-280, -440)
 nodes/Flair/node = SubResource("AnimationNodeAnimation_xp6r4")
@@ -182,4 +189,6 @@ nodes/Silly/node = SubResource("AnimationNodeAnimation_vw4qr")
 nodes/Silly/position = Vector2(-1160, -120)
 nodes/Animation/node = SubResource("AnimationNodeAnimation_wylqr")
 nodes/Animation/position = Vector2(-1140, 80)
-node_connections = [&"output", 0, &"FaceAdd", &"FaceAdd", 0, &"LocomotionBlend", &"FaceAdd", 1, &"EyesAdd", &"BaseEmotionAdd", 0, &"FaceExpression", &"BaseEmotionAdd", 1, &"BaseEmotion", &"EyesAdd", 0, &"BaseEmotionAdd", &"EyesAdd", 1, &"BlinkAdd", &"BlinkEyesAdd", 0, &"LeftBlink", &"BlinkEyesAdd", 1, &"RightBlink", &"BlinkAdd", 0, &"Gaze", &"BlinkAdd", 1, &"BlinkEyesAdd", &"LocomotionBlend", 0, &"Locomotion", &"LocomotionBlend", 1, &"Pose", &"Pose", 0, &"Idle", &"Pose", 1, &"Crying", &"Pose", 2, &"DancingSpeed", &"Pose", 3, &"StandingRelaxPose", &"Pose", 4, &"Sitting", &"DancingSpeed", 0, &"Transition", &"Transition", 0, &"Flair", &"Transition", 1, &"Rumba", &"Transition", 2, &"Silly", &"Transition", 3, &"Animation"]
+nodes/None/node = SubResource("AnimationNodeAnimation_7w10x")
+nodes/None/position = Vector2(-160, 180)
+node_connections = [&"output", 0, &"FaceAdd", &"FaceAdd", 0, &"LocomotionBlend", &"FaceAdd", 1, &"EyesAdd", &"BaseEmotionAdd", 0, &"FaceExpression", &"BaseEmotionAdd", 1, &"BaseEmotion", &"EyesAdd", 0, &"BaseEmotionAdd", &"EyesAdd", 1, &"BlinkAdd", &"BlinkEyesAdd", 0, &"LeftBlink", &"BlinkEyesAdd", 1, &"RightBlink", &"BlinkAdd", 0, &"Gaze", &"BlinkAdd", 1, &"BlinkEyesAdd", &"LocomotionBlend", 0, &"Pose", &"LocomotionBlend", 1, &"Locomotion", &"Pose", 0, &"Idle", &"Pose", 1, &"Crying", &"Pose", 2, &"DancingSpeed", &"Pose", 3, &"StandingRelaxPose", &"Pose", 4, &"Sitting", &"Pose", 5, &"None", &"DancingSpeed", 0, &"Transition", &"Transition", 0, &"Flair", &"Transition", 1, &"Rumba", &"Transition", 2, &"Silly", &"Transition", 3, &"Animation"]

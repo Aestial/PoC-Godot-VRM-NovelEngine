@@ -24,12 +24,24 @@ signal target_hit(position: Vector3, damage: float)
 const DEFAULT_GUN: PackedScene = preload("res://samples/shooter_demo/weapons/rifle_placeholder.tscn")
 
 const COLLISION_MASK: int = 1 | 4 # world + shootable
+## Fallback distance in front of the gun when the mesh has no Muzzle marker.
+const MUZZLE_DISTANCE: float = 0.9
 
 @export var config: WeaponConfig
 @export var gun_scene: PackedScene
 ## Extra character bodies that bullets pass through without interacting
 ## (auto-filled with everything in the ControllableCharacter group).
 @export var shoot_through_group: StringName = &"ControllableCharacter"
+
+## --- Rifle hand socket ---
+## When a humanoid skeleton with this bone exists in the VRM model, the gun is
+## posed on the bone every frame (position + horizontal aim), so the rifle no
+## longer floats at the rig transform.
+@export var socket_bone_name: String = "RightHand"
+## Extra world offset applied on top of the bone position (m/s tune in editor).
+@export var socket_offset: Vector3 = Vector3(0.06, -0.02, 0.12)
+## Extra pitch applied to the gun around the character forward (deg).
+@export var socket_pitch_deg: float = 0.0
 
 var ammo_in_mag: int = 0
 var reserve_ammo: int = 0
@@ -38,10 +50,14 @@ var aim_active: bool = false
 
 var _config: WeaponConfig
 var _character: Node3D
-var _collision_shape: Node
+var _collision_shape: Node3D
 var _camera: Node # ThirdPersonCamera
 var _muzzle: Node3D
 var _gun: Node3D
+var _skeleton: Skeleton3D
+var _hand_bone: int = -1
+var _socket_local: Transform3D
+var _anim_tree: AnimationTree
 
 var _fire_cooldown: float = 0.0
 var _spread_bloom: float = 0.0
@@ -50,7 +66,7 @@ var _reload_elapsed: float = 0.0
 
 
 func _ready() -> void:
-	_collision_shape = get_parent()
+	_collision_shape = get_parent() as Node3D
 	_character = _collision_shape.get_parent()
 	_camera = _character.get_node("ThirdPersonCamera") if _character.has_node("ThirdPersonCamera") else null
 
@@ -61,6 +77,46 @@ func _ready() -> void:
 
 	_spawn_gun()
 	_muzzle = get_node_or_null("Muzzle")
+	_socket_local = _gun.transform
+	_resolve_hand_socket()
+
+
+## Finds the VRM humanoid skeleton + hand bone. The gun keeps its scene-set
+## local transform when no usable skeleton/bone is found (editor fallback).
+func _resolve_hand_socket() -> void:
+	var skels: Array = _character.find_children("*", "Skeleton3D", true, false)
+	for s in skels:
+		var sk := s as Skeleton3D
+		if sk == null:
+			continue
+		var idx := sk.find_bone(socket_bone_name)
+		if idx >= 0:
+			_skeleton = sk
+			_hand_bone = idx
+			return
+
+
+## Poses the gun on the right-hand bone, keeping the barrel (-Z) horizontal
+## along the character's aim direction so it matches the center crosshair.
+## The hand position (and animation) controls where the gun is; yaw/pitch
+## come from the aim so the rifle never points sideways to the shot.
+func _update_socket() -> void:
+	if _skeleton == null or _hand_bone < 0:
+		return
+	var pose := _skeleton.get_bone_global_pose(_hand_bone)
+	var bone_world := _skeleton.global_transform * pose
+
+	var aim_forward := -(_collision_shape.global_transform.basis.z)
+	aim_forward.y = 0.0
+	if aim_forward.length() < 0.001:
+		aim_forward = -_collision_shape.global_transform.basis.z
+	aim_forward = aim_forward.normalized()
+
+	var look_target: Vector3 = bone_world.origin + aim_forward
+	_gun.look_at(look_target, Vector3.UP)
+	_gun.global_position = bone_world.origin + socket_offset
+	if not is_zero_approx(socket_pitch_deg):
+		_gun.rotate_object_local(Vector3.RIGHT, deg_to_rad(socket_pitch_deg))
 
 
 func _spawn_gun() -> void:
@@ -72,6 +128,13 @@ func _spawn_gun() -> void:
 
 
 func _process(delta: float) -> void:
+	# The VRM model is instantiated by the character AFTER this node's _ready,
+	# so the hand-bone socket is resolved lazily until the skeleton appears.
+	if _skeleton == null or _hand_bone < 0:
+		_resolve_hand_socket()
+	if _anim_tree == null:
+		_anim_tree = _character.get_node_or_null("AnimationTree") as AnimationTree
+
 	if _fire_cooldown > 0.0:
 		_fire_cooldown = maxf(0.0, _fire_cooldown - delta)
 	if _recent_shot > 0.0:
@@ -96,6 +159,9 @@ func _process(delta: float) -> void:
 	# otherwise the collision-shape script keeps facing the movement direction.
 	if _collision_shape and _collision_shape.get("mesh_faces_camera_direction") != null:
 		_collision_shape.mesh_faces_camera_direction = aim_active or _recent_shot > 0.0
+
+	_update_socket()
+	_mirror_aim_blend()
 
 
 ## --- Public state queries (used by the action API / HUD) ---
@@ -142,6 +208,17 @@ func set_aim_active(active: bool) -> void:
 		return
 	aim_active = active
 	aim_changed.emit(active)
+
+
+## Keep the Aim state's blend space in sync with movement speed at all times
+## (while ADS the legs mirror walking/running; outside ADS the value is parked
+## near the idle pole so re-entering aim never starts from a stale pose).
+func _mirror_aim_blend() -> void:
+	if _anim_tree == null:
+		return
+	var speed := Vector2(_character.velocity.x, _character.velocity.z).length()
+	var move_speed: float = remap(speed, 0.15, 1.5, 0.0, 1.0)
+	_anim_tree.set("parameters/Locomotion/Aim/blend_position", move_speed)
 
 
 func play_dry_sound() -> void:
@@ -235,6 +312,13 @@ func _resolve_shot(spread_deg: float) -> Dictionary:
 
 
 func _get_muzzle_origin() -> Vector3:
+	# Prefer a Muzzle marker inside the gun mesh; else derive it from the gun's
+	# forward (the gun is posed on the hand socket, so the old rig-local Muzzle
+	# node would be left behind).
+	if _gun and is_instance_valid(_gun) and _gun.has_node("Muzzle"):
+		return (_gun.get_node("Muzzle") as Node3D).global_position
+	if _gun and is_instance_valid(_gun):
+		return _gun.global_position - _gun.global_transform.basis.z * MUZZLE_DISTANCE
 	if _muzzle and is_instance_valid(_muzzle):
 		return _muzzle.global_position
 	return _character.global_position + Vector3.UP * 1.4
@@ -260,5 +344,14 @@ func _find_damageable(collider: Object) -> Node:
 
 
 func _spawn_muzzle_flash() -> void:
-	var anchor := _muzzle if _muzzle else self
+	# Flash at the real muzzle (hand socket / gun barrel), not the rig origin.
+	var scene := get_tree().current_scene
+	if scene == null:
+		return
+	var anchor := Node3D.new()
+	scene.add_child(anchor)
+	anchor.global_position = _get_muzzle_origin()
 	FxBank.muzzle_flash(anchor)
+	var tween := anchor.create_tween()
+	tween.tween_interval(0.2)
+	tween.tween_callback(anchor.queue_free)

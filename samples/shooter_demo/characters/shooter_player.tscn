@@ -7,8 +7,23 @@
 [ext_resource type="Script" uid="uid://bb4wqttmcxhdm" path="res://samples/shooter_demo/scripts/actions/action_aim.gd" id="5_aim"]
 [ext_resource type="Script" uid="uid://stlhmvpbpjon" path="res://samples/shooter_demo/scripts/actions/action_reload.gd" id="6_reload"]
 [ext_resource type="Script" uid="uid://dkjv2h8mhrwoq" path="res://samples/shooter_demo/scripts/weapon/weapon_rig.gd" id="7_rig"]
+[ext_resource type="Script" uid="uid://ck0gqysnuj6kb" path="res://samples/shooter_demo/scripts/weapon/weapon_config.gd" id="8_5eass"]
 [ext_resource type="Script" uid="uid://d1hjmb7cly4p5" path="res://samples/shooter_demo/scripts/camera/shooter_camera.gd" id="9_cam"]
 [ext_resource type="PackedScene" uid="uid://csd375f4ra5qj" path="res://samples/shooter_demo/weapons/rifle_colors.tscn" id="10_dcgaf"]
+[ext_resource type="AnimationNodeBlendTree" uid="uid://dx2b4jcb4wi7y" path="res://samples/shooter_demo/animations/shooter-combat_blendtree.tres" id="11_tree"]
+
+[sub_resource type="Resource" id="Resource_yj6sg"]
+script = ExtResource("8_5eass")
+damage = 30.0
+reload_time = 2.0
+spread_degrees = 1.0
+aim_spread_degrees = 0.3
+recoil_pitch = 0.8
+recoil_yaw = 0.4
+ads_fov = 40.0
+ads_spring_length = 1.0
+tracer_color = Color(0.7843704, 0.9566137, 0.9562132, 1)
+metadata/_custom_type_script = "uid://ck0gqysnuj6kb"
 
 [node name="ShooterPlayer" unique_id=1373497220 instance=ExtResource("1_base")]
 character_type = 1
@@ -27,19 +42,36 @@ script = ExtResource("6_reload")
 
 [node name="AnimationTree" parent="." index="1" unique_id=835141688]
 root_node = NodePath("../CollisionShape3D/ModelContainer/Natalia")
+tree_root = ExtResource("11_tree")
 anim_player = NodePath("../CollisionShape3D/ModelContainer/Natalia/AnimationPlayer")
+parameters/Locomotion/conditions/AIM = false
+parameters/Locomotion/conditions/NO_AIM = false
+parameters/Locomotion/Aim/blend_position = 0.0
+parameters/Locomotion/Motion/blend_position = 0.09554647
+parameters/FaceExpression/mood_amount/blend_amount = 1.0
 parameters/LeftBlink/blend_position = 0.0
 parameters/RightBlink/blend_position = 0.0
 parameters/LocomotionBlend/blend_amount = 1.0
+parameters/Pose/current_index = 1
+parameters/DancingSpeed/scale = 0.8800000000000026
+parameters/Transition/current_state = "rumba"
+parameters/Transition/current_index = 1
 
 [node name="Camera3D" parent="." index="2" unique_id=1029224579]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4978504, 1.25)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4978504, 2.4)
 
 [node name="ThirdPersonCamera" parent="." index="3" unique_id=1273729270]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4978504, 0)
 script = ExtResource("9_cam")
-shoulder_offset = 0.4
-ads_shoulder_offset = 0.25
+shoulder_offset = 0.35
+ads_shoulder_offset = 0.2
+default_camera_distance = 2.4
+
+[node name="SpringArm3D" parent="ThirdPersonCamera" index="0" unique_id=609274542]
+spring_length = 2.4
+
+[node name="PhantomCamera3D" parent="ThirdPersonCamera/SpringArm3D" index="0" unique_id=1851913725]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2.4)
 
 [node name="PortraitCamera" parent="CollisionShape3D" parent_id_path=PackedInt32Array(936994944) index="0" unique_id=1832556271]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5193706, 0)
@@ -48,9 +80,11 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5193706, 0)
 transform = Transform3D(-1, 0, -1.509958e-07, 0, 1, 0, 1.509958e-07, 0, -1, 0, -0.82869476, 0)
 
 [node name="WeaponRig" type="Node3D" parent="CollisionShape3D" parent_id_path=PackedInt32Array(936994944) index="4" unique_id=1431489314]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.11779125, 0.45391673, -0.31508422)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.18359573, 0.45391673, -0.21167716)
 script = ExtResource("7_rig")
+config = SubResource("Resource_yj6sg")
 gun_scene = ExtResource("10_dcgaf")
+socket_offset = Vector3(0, 0, 0)
 
 [node name="Muzzle" type="Node3D" parent="CollisionShape3D/WeaponRig" index="0" unique_id=1261889272]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.72)

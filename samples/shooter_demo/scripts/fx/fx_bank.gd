@@ -74,6 +74,8 @@ static func muzzle_flash(anchor: Node3D) -> void:
 
 
 ## Persistent-ish bullet hole decal on world surfaces (shows where shots land).
+## The quad is oriented from the hit normal (parallel to the surface), robust
+## for vertical and horizontal surfaces alike, and drawn double-sided.
 static func bullet_hole(parent: Node, position: Vector3, normal: Vector3, life: float = 8.0) -> void:
 	if parent == null or not parent.is_inside_tree():
 		return
@@ -84,15 +86,23 @@ static func bullet_hole(parent: Node, position: Vector3, normal: Vector3, life: 
 	var mat := StandardMaterial3D.new()
 	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	mat.cull_mode = BaseMaterial3D.CULL_DISABLED
 	mat.albedo_color = Color(0.05, 0.05, 0.05, 0.85)
 	mat.roughness = 1.0
 	mesh.mesh = quad
 	mesh.material_override = mat
 	holder.add_child(mesh)
 	parent.add_child(holder)
-	holder.global_position = position + normal * 0.006
-	holder.look_at(position - normal, Vector3.UP) # quad +Z faces the surface normal
-	mesh.rotation.y = randf() * TAU # avoid identical orientations
+
+	# Build an orthonormal basis with Z along the hit normal: the quad (which
+	# faces +Z) then lies exactly parallel to the surface.
+	var n := normal.normalized()
+	var up_ref := Vector3.UP if absf(n.dot(Vector3.UP)) < 0.99 else Vector3.FORWARD
+	var x := up_ref.cross(n).normalized()
+	var y := n.cross(x).normalized()
+	holder.global_transform = Transform3D(Basis(x, y, n), position + n * 0.006)
+	mesh.rotation.y = randf() * TAU # vary the hole's roll around the normal
+
 	var tween := holder.create_tween()
 	tween.tween_interval(maxf(0.0, life - 0.6))
 	tween.tween_method(func(a: float) -> void: mat.albedo_color = Color(0.05, 0.05, 0.05, a), 0.85, 0.0, 0.6)

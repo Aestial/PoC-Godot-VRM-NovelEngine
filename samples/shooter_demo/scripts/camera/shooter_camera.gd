@@ -15,12 +15,30 @@ class_name ShooterCamera
 ## Shoulder offset while aiming (recenter over the sights).
 @export var ads_shoulder_offset: float = 0.3
 
+@export_group("Distance")
+## Hip-fire chase distance (spring-arm length + camera offset). Tunable at
+## runtime through set_camera_distance() (pause/settings menu).
+@export var default_camera_distance: float = 2.4
+
 var _shoulder_current: float = 0.0
 
 
 func _process(delta: float) -> void:
 	_update_shoulder(delta)
 	super._process(delta)
+	# Keep the phantom camera child in sync with the (possibly ADS-lerped)
+	# spring length so the authored offset never fights the arm.
+	if not is_equal_approx(camera.position.z, spring_arm.spring_length):
+		camera.position.z = spring_arm.spring_length
+
+
+## Live camera distance (hip-fire). While ADS the base ADS blend takes over;
+## on release the camera returns to this distance again.
+func set_camera_distance(value: float) -> void:
+	default_camera_distance = clampf(value, 0.4, 8.0)
+	if not _aim_active:
+		spring_arm.spring_length = default_camera_distance
+		camera.position.z = default_camera_distance
 
 
 func _update_shoulder(delta: float) -> void:
