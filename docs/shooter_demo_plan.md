@@ -107,12 +107,17 @@ Collision/layer changes (project settings, additive):
 ## 3. Phases
 
 ### Phase 0 — Baseline hardening (small, high-value fixes before feature work)
-- [ ] Fix `DashPickup` (and sample scenes' stale `res://controller_examples/…` refs) or remove pickup from arena; wire `DASH` action into shooter player's container if kept.
-- [ ] Decide RUN: add a layered `RUN` speed action to the shooter character (Shift) — cheap, uses existing MOVE layering.
-- [ ] Input map: add `fire` (LMB), `aim` (RMB), `reload` (R); ensure no clash with `dialogic_default_action` / pointer capture; keep `interact` (X) separate.
-- [ ] Pointer/pause discipline: arena sets `MOUSE_MODE_CAPTURED` on start; ESC → visible (existing pattern); pause toggling releases/captures.
-- [ ] Add `shootable` physics layer name.
-- **Acceptance:** clean boot of the arena, no runtime script-load errors (dash/legacy paths), all current movement + interaction working before shooter code lands.
+- [x] Fixed `DashPickup` + all stale sample refs (`res://controller_examples/…`, `res://character_controller/…` → relocated `samples/`/`addons/` paths); the runtime `load()` in `dash_pickup_trigger.gd` now resolves and the grant was verified end-to-end (headless smoke PASS). Dash is kept; wiring into the shooter container happens in Phase 1.
+- [x] RUN decision: implemented layered `action_run.gd` (`samples/shooter_demo/scripts/actions/`, ACTION_ID `RUN`, grounded-only, exported `run_speed`); node wiring into the shooter character happens in Phase 1. Existing input action `run` (Shift) already drives play/stop via the controller.
+- [x] Input map: added `fire` (LMB), `aim` (RMB), `reload` (R) — verified registered (1 event each); no clash with `dialogic_default_action` / pointer capture; `interact` (X) untouched. Gamepad bindings deferred to a later pass.
+- [ ] Pointer/pause discipline: pattern confirmed in existing code; final capture-on-start wiring lands with the arena scene in Phase 3.
+- [x] Added `shootable` physics layer name (3d_physics/layer_3) for targets in Phase 2.
+- **Acceptance:** ✅ all touched scenes boot clean headless (testground, MCC Prototype, Welcome) with zero script/scene errors; no stale path references remain (grep = 0).
+
+**Phase 0 close-out notes (session log):**
+- Renderer upgraded: `renderer/rendering_method="forward_plus"` (Windows-only target; `.mobile` left as `gl_compatibility`). Requires one editor open/import pass to refresh caches — spot-check visuals in-editor.
+- `visual-novel/animations/rifle-shooting-mvc.res` verified loadable (binary resource). Clips (55 tracks each): `Rifle Idle`, `Rifle Aiming Idle`, `Rifle Run`, `Walking`, `Gunplay` (0.47 s), `Firing Rifle` (2.37 s), `Reload` (8.2 s), `Reloading` (6.8 s), `X Bot`. These are for Phase 1: load as a new animation library on the player model and drive via a dedicated rifle blend/pose layer.
+- Validated with Godot v4.6.3 (Godots) headless; harnesses were temporary (under `.godot/`, removed).
 
 ### Phase 1 — Combat core (D2, D3, D5)
 - [ ] `weapon_rig.gd` + `WeaponResource`-ish config: damage, fire_rate, auto/semi, mag/reserve, reload_time, spread, recoil, ADS fov/zoom, tracer color, muzzle pos; single rifle for v1, data-driven for arsenal later.
