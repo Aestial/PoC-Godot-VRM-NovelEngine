@@ -25,11 +25,11 @@ animation = &"basic-locomotion_library/Regular Running"
 
 [sub_resource type="AnimationNodeBlendSpace1D" id="AnimationNodeBlendSpace1D_aihfo"]
 blend_point_0/node = SubResource("AnimationNodeAnimation_c0w8h")
-blend_point_0/pos = 0.90
+blend_point_0/pos = 0.9
 blend_point_1/node = SubResource("AnimationNodeAnimation_ybftw")
 blend_point_1/pos = 0.1
 blend_point_2/node = SubResource("AnimationNodeAnimation_dx02s")
-blend_point_2/pos = 1.80
+blend_point_2/pos = 1.8
 min_space = -0.02
 max_space = 2.0
 sync = true

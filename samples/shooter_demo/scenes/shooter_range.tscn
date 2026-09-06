@@ -1,0 +1,133 @@
+[gd_scene format=3 uid="uid://blaotcm62cyv6"]
+
+[ext_resource type="PackedScene" path="res://samples/shooter_demo/scenes/shooter_hud.tscn" id="1_hud"]
+[ext_resource type="PackedScene" uid="uid://cjxe0v2258fy1" path="res://samples/shooter_demo/characters/shooter_player.tscn" id="2_player"]
+[ext_resource type="Script" uid="uid://caigcps64adue" path="res://samples/shooter_demo/scripts/controllers/controller_player_shooter.gd" id="3_ctrl"]
+[ext_resource type="Script" uid="uid://cdhj5gruoyjwg" path="res://visual-novel/scripts/actions/pointer_capture.gd" id="4_ptr"]
+[ext_resource type="Texture2D" uid="uid://doyodkg1ds7td" path="res://samples/controller_examples/assets/textures/Sky.png" id="5_sky"]
+
+[sub_resource type="PanoramaSkyMaterial" id="sky_mat"]
+panorama = ExtResource("5_sky")
+
+[sub_resource type="Sky" id="sky"]
+sky_material = SubResource("sky_mat")
+
+[sub_resource type="Environment" id="env"]
+background_mode = 2
+background_energy_multiplier = 0.9
+sky = SubResource("sky")
+tonemap_mode = 3
+glow_enabled = true
+
+[sub_resource type="StandardMaterial3D" id="mat_plank_a"]
+albedo_color = Color(0.9, 0.35, 0.3, 1)
+roughness = 0.7
+
+[sub_resource type="StandardMaterial3D" id="mat_plank_b"]
+albedo_color = Color(0.3, 0.6, 0.95, 1)
+roughness = 0.7
+
+[sub_resource type="StandardMaterial3D" id="mat_plank_c"]
+albedo_color = Color(0.95, 0.8, 0.3, 1)
+roughness = 0.7
+
+[node name="ShooterRange" type="Node3D" unique_id=1301017487]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1660191013]
+environment = SubResource("env")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1293569092]
+transform = Transform3D(-0.866026, -0.433013, 0.249999, 0.5, -0.75, 0.433012, -1.3411e-07, 0.499999, 0.866026, 0, 0, 0)
+shadow_enabled = true
+
+[node name="Characters" type="Node" parent="." unique_id=627819189]
+
+[node name="Player" parent="Characters" unique_id=1780186129 instance=ExtResource("2_player")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 12)
+default_pose_amount = 1.0
+
+[node name="Controllers" type="Node" parent="." unique_id=675341838]
+script = ExtResource("4_ptr")
+
+[node name="PlayerController" type="Node" parent="Controllers" unique_id=1589892642 node_paths=PackedStringArray("controlled_obj")]
+script = ExtResource("3_ctrl")
+controlled_obj = NodePath("../../Characters/Player")
+
+[node name="HUD" parent="." unique_id=988038772 instance=ExtResource("1_hud")]
+player_path = NodePath("../Characters/Player")
+
+[node name="Level" type="Node" parent="." unique_id=1183554940]
+
+[node name="Floor" type="CSGBox3D" parent="Level" unique_id=977813701]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, 0)
+use_collision = true
+size = Vector3(42, 0.5, 42)
+
+[node name="BackWall" type="CSGBox3D" parent="Level" unique_id=890442704]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, -21)
+use_collision = true
+size = Vector3(26, 6, 0.5)
+
+[node name="SideWallLeft" type="CSGBox3D" parent="Level" unique_id=707683151]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13, 3, 0)
+use_collision = true
+size = Vector3(0.5, 6, 44)
+
+[node name="SideWallRight" type="CSGBox3D" parent="Level" unique_id=1254513713]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13, 3, 0)
+use_collision = true
+size = Vector3(0.5, 6, 44)
+
+[node name="PlankA1" type="CSGBox3D" parent="Level" unique_id=927032352]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 4.4, -20.75)
+use_collision = true
+size = Vector3(1.5, 1.2, 0.15)
+material = SubResource("mat_plank_a")
+
+[node name="PlankA2" type="CSGBox3D" parent="Level" unique_id=1463818683]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.4, -20.75)
+use_collision = true
+size = Vector3(1.5, 1.2, 0.15)
+material = SubResource("mat_plank_a")
+
+[node name="PlankA3" type="CSGBox3D" parent="Level" unique_id=311419673]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 4.4, -20.75)
+use_collision = true
+size = Vector3(1.5, 1.2, 0.15)
+material = SubResource("mat_plank_a")
+
+[node name="PlankB1" type="CSGBox3D" parent="Level" unique_id=1155568740]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 2.8, -20.75)
+use_collision = true
+size = Vector3(1.5, 1.2, 0.15)
+material = SubResource("mat_plank_b")
+
+[node name="PlankB2" type="CSGBox3D" parent="Level" unique_id=1470377789]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.8, -20.75)
+use_collision = true
+size = Vector3(1.5, 1.2, 0.15)
+material = SubResource("mat_plank_b")
+
+[node name="PlankB3" type="CSGBox3D" parent="Level" unique_id=929501339]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 2.8, -20.75)
+use_collision = true
+size = Vector3(1.5, 1.2, 0.15)
+material = SubResource("mat_plank_b")
+
+[node name="PlankC1" type="CSGBox3D" parent="Level" unique_id=126468845]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 1.2, -20.75)
+use_collision = true
+size = Vector3(1.5, 1.2, 0.15)
+material = SubResource("mat_plank_c")
+
+[node name="PlankC2" type="CSGBox3D" parent="Level" unique_id=1466913756]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, -20.75)
+use_collision = true
+size = Vector3(1.5, 1.2, 0.15)
+material = SubResource("mat_plank_c")
+
+[node name="PlankC3" type="CSGBox3D" parent="Level" unique_id=71785293]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 1.2, -20.75)
+use_collision = true
+size = Vector3(1.5, 1.2, 0.15)
+material = SubResource("mat_plank_c")

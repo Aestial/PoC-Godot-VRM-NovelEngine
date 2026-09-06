@@ -120,15 +120,21 @@ Collision/layer changes (project settings, additive):
 - Validated with Godot v4.6.3 (Godots) headless; harnesses were temporary (under `.godot/`, removed).
 
 ### Phase 1 — Combat core (D2, D3, D5)
-- [ ] `weapon_rig.gd` + `WeaponResource`-ish config: damage, fire_rate, auto/semi, mag/reserve, reload_time, spread, recoil, ADS fov/zoom, tracer color, muzzle pos; single rifle for v1, data-driven for arsenal later.
-- [ ] Actions `SHOOT`, `AIM`, `RELOAD` per §2; controller `ControllerPlayerShooter`.
-- [ ] ADS & camera: additive additions to `visual-novel/scripts/camera/third_person_camera.gd` (ADS fov/offset helpers, back-compatible), recoil camera kick, spread crosshair feedback.
-- [ ] Body-turn while aiming: additive runtime flag in `character_collision_shape.gd`; `shooter_character.gd` drives it.
-- [ ] Gun visuals: CC0 Kenney-style or CSG placeholder on a hand/chest socket node of the VRM model (hand bone lookup via Skeleton3D `find_bone` fallback to chest socket) — D5.
-- [ ] HUD v1 (`shooter_hud.tscn`): crosshair w/ spread, ammo `mag/reserve`, reload prompt, hitmarker, low-ammo flash; CanvasLayer independent of character.
-- [ ] Muzzle flash + tracer + impact decal/spark FX nodes.
-- [ ] SFX: CC0 Kenney blaster/shot samples or lightweight generated placeholders (no repo audio exists for weapons).
-- **Acceptance:** fire at wall shows tracer+impact; semi/auto cadence feels right; ADS zooms smoothly & body turns to camera; reload blocks fire, walk allowed; ammo HUD accurate; no errors when dialogue opens (fire blocked).
+- [x] `weapon_rig.gd` (`samples/shooter_demo/scripts/weapon/`) + `weapon_config.gd` resource: damage, fire_rate, auto/semi, mag/reserve, reload_time, spread + bloom, recoil, range, tracer color; single data-driven rifle for v1. Rig is character-private ("body"); actions are the public API.
+- [x] Actions `SHOOT` (impulse, cooldown in rig) / `AIM` (layered) / `RELOAD` (non-layered, whitelists MOVE/AIM/RUN); controller `ControllerPlayerShooter` (LMB auto/semi + edge detect, RMB ADS, R reload, auto-reload on empty trigger, dry-fire click). All combat gated by `NovelCharacter.is_busy` (no firing during Dialogic).
+- [x] ADS & camera: additive, back-compatible additions to `third_person_camera.gd` — `set_aim_active()` (smooth FOV + spring-arm blend) and `add_recoil()` (decaying view kick).
+- [x] Body-turn while aiming/firing: `WeaponRig` drives the existing `mesh_faces_camera_direction` flag on `character_collision_shape.gd` (no script change needed there).
+- [x] Gun visuals: stylized CSG rifle (`weapons/rifle_placeholder.tscn`, replaceable via `WeaponRig.gun_scene`) mounted on the rig under `CollisionShape3D` with a Muzzle marker. Hand-bone/socket polish deferred with the animation layer.
+- [x] HUD v1 (`scenes/shooter_hud.tscn` + `ui/` scripts): crosshair with live spread (grows with bloom), ammo `mag / reserve`, reloading + "Press R" prompts, low-ammo color, hitmarker flash (fires on `WeaponRig.target_hit`).
+- [x] Muzzle flash (`OmniLight3D` pulse) + tracer (fading additive box beam) + impact flash FX via `fx/fx_bank.gd`.
+- [x] SFX: procedural PCM placeholders via `audio/sfx_bank.gd` (shot/dry/reload/hit) — no assets; swappable later.
+- [x] Dev level: `scenes/shooter_range.tscn` (Natalia `shooter_player.tscn` + plank wall gallery) — boot scene for testing.
+- **Acceptance:** ✅ headless combat harness PASS (26 checks: mag 30/120, cadence & cooldown, ADS zoom + body turn + tightened spread, fire-in-ADS, reload refill 30/90, busy gating, no errors in fire path w/ tracer/impact FX). ✅ range/testground/Welcome/Prototype boot clean. Visual feel (crosshair, tracer look, ADS smoothness, gun placement on Natalia's hands) needs one in-editor pass by the owner.
+
+**Phase 1 close-out notes:**
+- Rendering note: previous "GL-compatibility" bullet is obsolete — project runs Forward+ now (Phase 0), so the arena can use standard forward materials; keep FX lightweight anyway (tracers are pooling candidates later).
+- Rifle animation layer (rifle-shooting-mvc clips) deliberately deferred (D5 decision); `WeaponRig` emits signals (`shot_fired`, `aim_changed`, `reload_finished`) ready to drive it in the polish pass.
+- Rig muzzle/hand placement (`WeaponRig` at `CollisionShape3D` local ≈ (0.14, 0.85, 0.02)) is a first guess — adjust in-editor to Natalia's right hand pose.
 
 ### Phase 2 — Targets & damage (D4 part 1)
 - [ ] `health.gd` (signals: damaged, died, respawned) + `target_dummy.gd` (hit flash, knockdown tween, score, timed respawn; popup + fixed variants), `moving_target.gd` (simple rail back-and-forth), `destructible_prop.gd` (crates; gibbed into debris or simple hide+respawn).
@@ -152,7 +158,7 @@ Collision/layer changes (project settings, additive):
 ---
 
 ## 4. Risks & notes
-- **GL-compatibility renderer** is used project-wide (web export). Keep materials unshaded/standard, avoid heavy particles; verify arena perf with many tracers (pool them).
+- **Renderer** is now **Forward+** (desktop/Windows target; `.mobile` stays compatibility for future web exports). Keep FX lightweight anyway — tracers/impacts are per-shot node spawns and should be pooled if the arena gets busy.
 - **VRM animation**: no gun animations exist; v1 relies on existing pose/locomotion + body-turn; do not retarget Mixamo combat clips into VRM libraries in v1 (D5) — reassess in Phase 4.
 - **Turn-to-aim mechanics** depend on additive hooks in `character_collision_shape.gd` (project code, safe to extend; keep default behavior for existing scenes: flag defaults preserve velocity-facing).
 - **Dialogic interplay**: `NovelCharacter.is_busy`/`Dialogic.current_timeline` gates all combat input; verify socket teleport does not desync weapon rig (rig lives under CollisionShape3D, rotates with model).
