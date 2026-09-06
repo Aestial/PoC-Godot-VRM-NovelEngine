@@ -15,7 +15,7 @@
 [sub_resource type="Resource" id="Resource_yj6sg"]
 script = ExtResource("8_5eass")
 damage = 30.0
-reload_time = 2.0
+reload_time = 3.0
 spread_degrees = 1.0
 aim_spread_degrees = 0.3
 recoil_pitch = 0.8
@@ -46,11 +46,13 @@ tree_root = ExtResource("11_tree")
 anim_player = NodePath("../CollisionShape3D/ModelContainer/Natalia/AnimationPlayer")
 parameters/Locomotion/conditions/AIM = false
 parameters/Locomotion/conditions/NO_AIM = false
+parameters/Locomotion/conditions/NO_RELOAD = false
+parameters/Locomotion/conditions/RELOADING = false
 parameters/Locomotion/Aim/blend_position = 0.0
-parameters/Locomotion/Motion/blend_position = 0.09554647
+parameters/Locomotion/Motion/blend_position = 0.7935813
 parameters/FaceExpression/mood_amount/blend_amount = 1.0
 parameters/LeftBlink/blend_position = 0.0
-parameters/RightBlink/blend_position = 0.0
+parameters/RightBlink/blend_position = 0.0019588881897986384
 parameters/LocomotionBlend/blend_amount = 1.0
 parameters/Pose/current_index = 1
 parameters/DancingSpeed/scale = 0.8800000000000026

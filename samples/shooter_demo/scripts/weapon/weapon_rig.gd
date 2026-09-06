@@ -162,6 +162,7 @@ func _process(delta: float) -> void:
 
 	_update_socket()
 	_mirror_aim_blend()
+	_sync_reload_state()
 
 
 ## --- Public state queries (used by the action API / HUD) ---
@@ -219,6 +220,16 @@ func _mirror_aim_blend() -> void:
 	var speed := Vector2(_character.velocity.x, _character.velocity.z).length()
 	var move_speed: float = remap(speed, 0.15, 1.5, 0.0, 1.0)
 	_anim_tree.set("parameters/Locomotion/Aim/blend_position", move_speed)
+
+
+## Drives the state machine into/out of the Reload state on the reload
+## lifecycle (start → RELOADING, finish/cancel → NO_RELOAD).
+func _sync_reload_state() -> void:
+	if _anim_tree == null:
+		return
+	var reloading: bool = is_reloading
+	_anim_tree.set("parameters/Locomotion/conditions/RELOADING", reloading)
+	_anim_tree.set("parameters/Locomotion/conditions/NO_RELOAD", not reloading)
 
 
 func play_dry_sound() -> void:

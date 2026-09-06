@@ -1,8 +1,10 @@
 extends ActionNode
 class_name ActionReload
 
-## RELOAD action (non-layered): starts the rig reload timer; movement keeps
-## working (MOVE/AIM/RUN are whitelisted), firing is blocked while reloading.
+## RELOAD action (non-layered): starts the rig reload timer and drives the
+## Reload state in the rifle locomotion state machine. The character plants
+## during the reload clip (movement/jump are not whitelisted so the legs match
+## the animation); ADS stays available.
 
 var _character
 var _rig
@@ -10,7 +12,7 @@ var _rig
 
 func _init() -> void:
 	ACTION_ID = "RELOAD"
-	interrupt_whitelist = [&"MOVE", &"AIM", &"RUN"]
+	interrupt_whitelist = [&"AIM"]
 
 
 func _ready() -> void:

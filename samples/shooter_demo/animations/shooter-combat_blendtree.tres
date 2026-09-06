@@ -141,12 +141,12 @@ input_3/break_loop_at_end = false
 input_3/reset = true
 
 [resource]
-graph_offset = Vector2(-110.49542, -378.9713)
+graph_offset = Vector2(-99.95563, -373.4287)
 nodes/output/position = Vector2(1640, 100)
 nodes/BaseEmotion/node = ExtResource("1_rfivk")
 nodes/BaseEmotion/position = Vector2(300, 140)
 nodes/Locomotion/node = ExtResource("3_1c22v")
-nodes/Locomotion/position = Vector2(520, -300)
+nodes/Locomotion/position = Vector2(500, -340)
 nodes/FaceAdd/node = SubResource("AnimationNodeAdd2_w1isf")
 nodes/FaceAdd/position = Vector2(1440, 60)
 nodes/FaceExpression/node = ExtResource("2_jnvbf")

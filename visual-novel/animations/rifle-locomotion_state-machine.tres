@@ -48,6 +48,9 @@ min_space = -0.02
 max_space = 2.0
 sync = true
 
+[sub_resource type="AnimationNodeAnimation" id="Anim_reload"]
+animation = &"rifle-shooting-mvc/Reloading"
+
 [sub_resource type="AnimationNodeStateMachineTransition" id="Tr_enter"]
 advance_mode = 2
 
@@ -71,6 +74,16 @@ xfade_time = 0.15
 advance_mode = 2
 advance_condition = &"NO_AIM"
 
+[sub_resource type="AnimationNodeStateMachineTransition" id="Tr_reload_in"]
+xfade_time = 0.12
+advance_mode = 2
+advance_condition = &"RELOADING"
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="Tr_reload_out"]
+xfade_time = 0.12
+advance_mode = 2
+advance_condition = &"NO_RELOAD"
+
 [resource]
 states/Aim/node = SubResource("Space_aim")
 states/Aim/position = Vector2(460, -120)
@@ -79,6 +92,8 @@ states/Jump/node = SubResource("Space_jump")
 states/Jump/position = Vector2(120, 60)
 states/Motion/node = SubResource("Space_motion")
 states/Motion/position = Vector2(120, 260)
+states/Reload/node = SubResource("Anim_reload")
+states/Reload/position = Vector2(460, 60)
 states/Start/position = Vector2(-220, 160)
-transitions = ["Start", "Motion", SubResource("Tr_enter"), "Motion", "Jump", SubResource("Tr_jump"), "Jump", "Motion", SubResource("Tr_land"), "Motion", "Aim", SubResource("Tr_aim"), "Aim", "Motion", SubResource("Tr_noaim"), "Aim", "Jump", SubResource("Tr_jump"), "Jump", "Aim", SubResource("Tr_aim")]
+transitions = ["Start", "Motion", SubResource("Tr_enter"), "Motion", "Jump", SubResource("Tr_jump"), "Jump", "Motion", SubResource("Tr_land"), "Motion", "Aim", SubResource("Tr_aim"), "Aim", "Motion", SubResource("Tr_noaim"), "Aim", "Jump", SubResource("Tr_jump"), "Jump", "Aim", SubResource("Tr_aim"), "Motion", "Reload", SubResource("Tr_reload_in"), "Aim", "Reload", SubResource("Tr_reload_in"), "Reload", "Motion", SubResource("Tr_reload_out"), "Reload", "Aim", SubResource("Tr_reload_out")]
 graph_offset = Vector2(-397, -107)
