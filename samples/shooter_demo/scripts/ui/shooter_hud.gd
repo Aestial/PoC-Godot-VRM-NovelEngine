@@ -2,7 +2,8 @@ extends CanvasLayer
 class_name ShooterHud
 
 ## Minimal shooter HUD: crosshair with live spread, ammo readout, reload/empty
-## prompts and hitmarker flash. Reads only public Action/WeaponRig APIs.
+## prompts, hitmarker flash and score/accuracy readout. Reads only public
+## Action/WeaponRig APIs plus the level ScoreKeeper (group lookup).
 
 @export var player_path: NodePath
 
@@ -12,6 +13,8 @@ const SPREAD_PX_PER_DEG := 5.0
 @onready var _canvas: ShooterCanvas = $Canvas
 @onready var _ammo_label: Label = $Canvas/AmmoLabel
 @onready var _status_label: Label = $Canvas/StatusLabel
+@onready var _score_label: Label = $Canvas/ScoreLabel
+@onready var _stats_label: Label = $Canvas/StatsLabel
 
 var _hitmarker_time: float = 0.0
 var _player: Node
@@ -59,6 +62,14 @@ func _process(delta: float) -> void:
 	_ammo_label.add_theme_color_override("font_color", LOW_AMMO_COLOR if empty else Color.WHITE)
 	_status_label.text = status
 	_status_label.visible = status != ""
+
+	var sk := get_tree().get_first_node_in_group("ScoreKeeper")
+	if sk:
+		_score_label.text = "SCORE  %05d" % int(sk.score)
+		_stats_label.text = "HITS %d / %d   ACC %d%%" % [int(sk.hits), int(sk.shots), roundi(sk.get_accuracy() * 100.0)]
+	else:
+		_score_label.text = "SCORE  00000"
+		_stats_label.text = ""
 
 	_canvas.spread_px = spread_deg * SPREAD_PX_PER_DEG
 	_canvas.hitmarker_active = _hitmarker_time > 0.0

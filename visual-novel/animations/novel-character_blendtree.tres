@@ -8,6 +8,7 @@
 animation = &"basic-dancing_library/Shuffling"
 
 [sub_resource type="AnimationNodeAdd2" id="AnimationNodeAdd2_cnjg4"]
+filters = ["%GeneralSkeleton/EyeExtra:EyeExtra_01.M_F00_000_00_EyeExtra_On", "%GeneralSkeleton/Face:Face.M_F00_000_00_Fcl_ALL_Angry", "%GeneralSkeleton/Face:Face.M_F00_000_00_Fcl_ALL_Fun", "%GeneralSkeleton/Face:Face.M_F00_000_00_Fcl_ALL_Joy", "%GeneralSkeleton/Face:Face.M_F00_000_00_Fcl_ALL_Sorrow", "%GeneralSkeleton/Face:Face.M_F00_000_00_Fcl_ALL_Surprised", "%GeneralSkeleton/Face:Face.M_F00_000_00_Fcl_EYE_Close", "%GeneralSkeleton/Face:Face.M_F00_000_00_Fcl_EYE_Close_L", "%GeneralSkeleton/Face:Face.M_F00_000_00_Fcl_EYE_Close_R", "%GeneralSkeleton/Face:Face.M_F00_000_00_Fcl_EYE_Extra", "%GeneralSkeleton/Face:Face.M_F00_000_00_Fcl_MTH_A", "%GeneralSkeleton/Face:Face.M_F00_000_00_Fcl_MTH_E", "%GeneralSkeleton/Face:Face.M_F00_000_00_Fcl_MTH_I", "%GeneralSkeleton/Face:Face.M_F00_000_00_Fcl_MTH_O", "%GeneralSkeleton/Face:Face.M_F00_000_00_Fcl_MTH_U"]
 
 [sub_resource type="AnimationNodeAdd2" id="AnimationNodeAdd2_jnvbf"]
 
@@ -21,6 +22,7 @@ animation = &"female_idle_actions_library/Crying"
 [sub_resource type="AnimationNodeAdd2" id="AnimationNodeAdd2_e4uwh"]
 
 [sub_resource type="AnimationNodeAdd2" id="AnimationNodeAdd2_w1isf"]
+filters = ["%GeneralSkeleton/EyeExtra:EyeExtra_01.M_F00_000_00_EyeExtra_On", "%GeneralSkeleton/Face:Face.M_F00_000_00_Fcl_ALL_Angry", "%GeneralSkeleton/Face:Face.M_F00_000_00_Fcl_ALL_Fun", "%GeneralSkeleton/Face:Face.M_F00_000_00_Fcl_ALL_Joy", "%GeneralSkeleton/Face:Face.M_F00_000_00_Fcl_ALL_Sorrow", "%GeneralSkeleton/Face:Face.M_F00_000_00_Fcl_ALL_Surprised", "%GeneralSkeleton/Face:Face.M_F00_000_00_Fcl_EYE_Close", "%GeneralSkeleton/Face:Face.M_F00_000_00_Fcl_EYE_Close_L", "%GeneralSkeleton/Face:Face.M_F00_000_00_Fcl_EYE_Close_R", "%GeneralSkeleton/Face:Face.M_F00_000_00_Fcl_EYE_Extra", "%GeneralSkeleton/Face:Face.M_F00_000_00_Fcl_MTH_A", "%GeneralSkeleton/Face:Face.M_F00_000_00_Fcl_MTH_E", "%GeneralSkeleton/Face:Face.M_F00_000_00_Fcl_MTH_I", "%GeneralSkeleton/Face:Face.M_F00_000_00_Fcl_MTH_O", "%GeneralSkeleton/Face:Face.M_F00_000_00_Fcl_MTH_U"]
 
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_xp6r4"]
 animation = &"basic-dancing_library/Flair"
@@ -89,11 +91,11 @@ input_4/break_loop_at_end = false
 input_4/reset = true
 
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_eqkeh"]
-animation = &"rifle-shooting-mvc/Rifle Idle"
+animation = &"rifle-shooting-mvc/Walking"
 
 [sub_resource type="AnimationNodeBlend2" id="AnimationNodeBlend2_jnvbf"]
 filter_enabled = true
-filters = ["%GeneralSkeleton:Chest", "%GeneralSkeleton:Head", "%GeneralSkeleton:LeftEye", "%GeneralSkeleton:LeftHand", "%GeneralSkeleton:LeftIndexDistal", "%GeneralSkeleton:LeftIndexIntermediate", "%GeneralSkeleton:LeftIndexProximal", "%GeneralSkeleton:LeftLittleDistal", "%GeneralSkeleton:LeftLittleIntermediate", "%GeneralSkeleton:LeftLittleProximal", "%GeneralSkeleton:LeftLowerArm", "%GeneralSkeleton:LeftMiddleDistal", "%GeneralSkeleton:LeftMiddleIntermediate", "%GeneralSkeleton:LeftMiddleProximal", "%GeneralSkeleton:LeftRingDistal", "%GeneralSkeleton:LeftRingIntermediate", "%GeneralSkeleton:LeftRingProximal", "%GeneralSkeleton:LeftShoulder", "%GeneralSkeleton:LeftThumbDistal", "%GeneralSkeleton:LeftThumbMetacarpal", "%GeneralSkeleton:LeftThumbProximal", "%GeneralSkeleton:LeftUpperArm", "%GeneralSkeleton:Neck", "%GeneralSkeleton:RightEye", "%GeneralSkeleton:RightHand", "%GeneralSkeleton:RightIndexDistal", "%GeneralSkeleton:RightIndexIntermediate", "%GeneralSkeleton:RightIndexProximal", "%GeneralSkeleton:RightLittleDistal", "%GeneralSkeleton:RightLittleIntermediate", "%GeneralSkeleton:RightLittleProximal", "%GeneralSkeleton:RightLowerArm", "%GeneralSkeleton:RightMiddleDistal", "%GeneralSkeleton:RightMiddleIntermediate", "%GeneralSkeleton:RightMiddleProximal", "%GeneralSkeleton:RightRingDistal", "%GeneralSkeleton:RightRingIntermediate", "%GeneralSkeleton:RightRingProximal", "%GeneralSkeleton:RightShoulder", "%GeneralSkeleton:RightThumbDistal", "%GeneralSkeleton:RightThumbMetacarpal", "%GeneralSkeleton:RightThumbProximal", "%GeneralSkeleton:RightUpperArm", "%GeneralSkeleton:Spine", "%GeneralSkeleton:UpperChest"]
+filters = ["%GeneralSkeleton:Chest", "%GeneralSkeleton:Head", "%GeneralSkeleton:LeftEye", "%GeneralSkeleton:LeftHand", "%GeneralSkeleton:LeftIndexDistal", "%GeneralSkeleton:LeftIndexIntermediate", "%GeneralSkeleton:LeftIndexProximal", "%GeneralSkeleton:LeftLittleDistal", "%GeneralSkeleton:LeftLittleIntermediate", "%GeneralSkeleton:LeftLittleProximal", "%GeneralSkeleton:LeftLowerArm", "%GeneralSkeleton:LeftMiddleDistal", "%GeneralSkeleton:LeftMiddleIntermediate", "%GeneralSkeleton:LeftMiddleProximal", "%GeneralSkeleton:LeftRingDistal", "%GeneralSkeleton:LeftRingIntermediate", "%GeneralSkeleton:LeftRingProximal", "%GeneralSkeleton:LeftShoulder", "%GeneralSkeleton:LeftThumbDistal", "%GeneralSkeleton:LeftThumbMetacarpal", "%GeneralSkeleton:LeftThumbProximal", "%GeneralSkeleton:LeftUpperArm", "%GeneralSkeleton:Neck", "%GeneralSkeleton:RightEye", "%GeneralSkeleton:RightHand", "%GeneralSkeleton:RightIndexDistal", "%GeneralSkeleton:RightIndexIntermediate", "%GeneralSkeleton:RightIndexProximal", "%GeneralSkeleton:RightLittleDistal", "%GeneralSkeleton:RightLittleIntermediate", "%GeneralSkeleton:RightLittleProximal", "%GeneralSkeleton:RightLowerArm", "%GeneralSkeleton:RightMiddleDistal", "%GeneralSkeleton:RightMiddleIntermediate", "%GeneralSkeleton:RightMiddleProximal", "%GeneralSkeleton:RightRingDistal", "%GeneralSkeleton:RightRingIntermediate", "%GeneralSkeleton:RightRingProximal", "%GeneralSkeleton:RightShoulder", "%GeneralSkeleton:RightThumbDistal", "%GeneralSkeleton:RightThumbMetacarpal", "%GeneralSkeleton:RightThumbProximal", "%GeneralSkeleton:RightUpperArm", "%GeneralSkeleton:UpperChest"]
 
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_jnvbf"]
 animation = &"RESET"
@@ -139,11 +141,12 @@ input_3/break_loop_at_end = false
 input_3/reset = true
 
 [resource]
+graph_offset = Vector2(134.57056, -208.1516)
 nodes/output/position = Vector2(1640, 100)
 nodes/BaseEmotion/node = ExtResource("1_rfivk")
 nodes/BaseEmotion/position = Vector2(300, 140)
 nodes/Locomotion/node = ExtResource("3_1c22v")
-nodes/Locomotion/position = Vector2(600, -240)
+nodes/Locomotion/position = Vector2(540, -560)
 nodes/FaceAdd/node = SubResource("AnimationNodeAdd2_w1isf")
 nodes/FaceAdd/position = Vector2(1440, 60)
 nodes/FaceExpression/node = ExtResource("2_jnvbf")
@@ -163,9 +166,9 @@ nodes/LeftBlink/position = Vector2(300, 620)
 nodes/RightBlink/node = SubResource("AnimationNodeBlendSpace1D_xp6r4")
 nodes/RightBlink/position = Vector2(300, 820)
 nodes/LocomotionBlend/node = SubResource("AnimationNodeBlend2_rfivk")
-nodes/LocomotionBlend/position = Vector2(880, -380)
+nodes/LocomotionBlend/position = Vector2(920, -380)
 nodes/Pose/node = SubResource("AnimationNodeTransition_jnvbf")
-nodes/Pose/position = Vector2(400, -420)
+nodes/Pose/position = Vector2(280, -400)
 nodes/Crying/node = SubResource("AnimationNodeAnimation_rfivk")
 nodes/Crying/position = Vector2(-280, -440)
 nodes/Flair/node = SubResource("AnimationNodeAnimation_xp6r4")
@@ -190,4 +193,4 @@ nodes/Animation/position = Vector2(-1140, 80)
 "nodes/Rifle Idle/position" = Vector2(900, -80)
 nodes/Rifle/node = SubResource("AnimationNodeBlend2_jnvbf")
 nodes/Rifle/position = Vector2(1240, -200)
-node_connections = [&"output", 0, &"FaceAdd", &"FaceAdd", 0, &"Rifle", &"FaceAdd", 1, &"EyesAdd", &"BaseEmotionAdd", 0, &"FaceExpression", &"BaseEmotionAdd", 1, &"BaseEmotion", &"EyesAdd", 0, &"BaseEmotionAdd", &"EyesAdd", 1, &"BlinkAdd", &"BlinkEyesAdd", 0, &"LeftBlink", &"BlinkEyesAdd", 1, &"RightBlink", &"BlinkAdd", 0, &"Gaze", &"BlinkAdd", 1, &"BlinkEyesAdd", &"LocomotionBlend", 0, &"Pose", &"LocomotionBlend", 1, &"Locomotion", &"Pose", 0, &"Idle", &"Pose", 1, &"Crying", &"Pose", 2, &"DancingSpeed", &"Pose", 3, &"StandingRelaxPose", &"Pose", 4, &"Sitting", &"DancingSpeed", 0, &"Transition", &"Transition", 0, &"Flair", &"Transition", 1, &"Rumba", &"Transition", 2, &"Silly", &"Transition", 3, &"Animation", &"Rifle", 0, &"LocomotionBlend", &"Rifle", 1, &"Rifle Idle"]
+node_connections = [&"output", 0, &"FaceAdd", &"FaceAdd", 0, &"Rifle", &"FaceAdd", 1, &"EyesAdd", &"BaseEmotionAdd", 0, &"FaceExpression", &"BaseEmotionAdd", 1, &"BaseEmotion", &"EyesAdd", 0, &"BaseEmotionAdd", &"EyesAdd", 1, &"BlinkAdd", &"BlinkEyesAdd", 0, &"LeftBlink", &"BlinkEyesAdd", 1, &"RightBlink", &"BlinkAdd", 0, &"Gaze", &"BlinkAdd", 1, &"BlinkEyesAdd", &"LocomotionBlend", 0, &"Locomotion", &"LocomotionBlend", 1, &"Pose", &"Pose", 0, &"Idle", &"Pose", 1, &"Crying", &"Pose", 2, &"DancingSpeed", &"Pose", 3, &"StandingRelaxPose", &"Pose", 4, &"Sitting", &"DancingSpeed", 0, &"Transition", &"Transition", 0, &"Flair", &"Transition", 1, &"Rumba", &"Transition", 2, &"Silly", &"Transition", 3, &"Animation", &"Rifle", 0, &"LocomotionBlend", &"Rifle", 1, &"Rifle Idle"]

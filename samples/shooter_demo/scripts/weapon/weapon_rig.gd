@@ -228,6 +228,9 @@ func _resolve_shot(spread_deg: float) -> Dictionary:
 	FxBank.tracer(get_tree().current_scene, _get_muzzle_origin(), result.get("position", result["end"]), _config.tracer_color)
 	if result["hit"]:
 		FxBank.impact(get_tree().current_scene, result["position"], result["normal"])
+		# Leave a bullet hole on plain surfaces (targets show flash + popups instead).
+		if not result["damaged"]:
+			FxBank.bullet_hole(get_tree().current_scene, result["position"], result["normal"])
 	return result
 
 

@@ -7,13 +7,8 @@
 [ext_resource type="Script" uid="uid://bb4wqttmcxhdm" path="res://samples/shooter_demo/scripts/actions/action_aim.gd" id="5_aim"]
 [ext_resource type="Script" uid="uid://stlhmvpbpjon" path="res://samples/shooter_demo/scripts/actions/action_reload.gd" id="6_reload"]
 [ext_resource type="Script" uid="uid://dkjv2h8mhrwoq" path="res://samples/shooter_demo/scripts/weapon/weapon_rig.gd" id="7_rig"]
-[ext_resource type="Script" uid="uid://ck0gqysnuj6kb" path="res://samples/shooter_demo/scripts/weapon/weapon_config.gd" id="8_5eass"]
-
-[sub_resource type="Resource" id="Resource_jyf63"]
-script = ExtResource("8_5eass")
-recoil_pitch = 0.1
-recoil_yaw = 0.05
-metadata/_custom_type_script = "uid://ck0gqysnuj6kb"
+[ext_resource type="Script" uid="uid://d1hjmb7cly4p5" path="res://samples/shooter_demo/scripts/camera/shooter_camera.gd" id="9_cam"]
+[ext_resource type="PackedScene" uid="uid://csd375f4ra5qj" path="res://samples/shooter_demo/weapons/rifle_colors.tscn" id="10_dcgaf"]
 
 [node name="ShooterPlayer" unique_id=1373497220 instance=ExtResource("1_base")]
 character_type = 1
@@ -42,14 +37,20 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4978504, 1.25)
 
 [node name="ThirdPersonCamera" parent="." index="3" unique_id=1273729270]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4978504, 0)
+script = ExtResource("9_cam")
+shoulder_offset = 0.4
+ads_shoulder_offset = 0.25
 
 [node name="PortraitCamera" parent="CollisionShape3D" parent_id_path=PackedInt32Array(936994944) index="0" unique_id=1832556271]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5193706, 0)
 
+[node name="ModelContainer" parent="CollisionShape3D" parent_id_path=PackedInt32Array(936994944) index="2" unique_id=249119247]
+transform = Transform3D(-1, 0, -1.509958e-07, 0, 1, 0, 1.509958e-07, 0, -1, 0, -0.82869476, 0)
+
 [node name="WeaponRig" type="Node3D" parent="CollisionShape3D" parent_id_path=PackedInt32Array(936994944) index="4" unique_id=1431489314]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.19075046, 0.27266675, -0.41719317)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.11779125, 0.45391673, -0.31508422)
 script = ExtResource("7_rig")
-config = SubResource("Resource_jyf63")
+gun_scene = ExtResource("10_dcgaf")
 
 [node name="Muzzle" type="Node3D" parent="CollisionShape3D/WeaponRig" index="0" unique_id=1261889272]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.72)

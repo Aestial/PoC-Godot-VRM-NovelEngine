@@ -137,10 +137,20 @@ Collision/layer changes (project settings, additive):
 - Rig muzzle/hand placement (`WeaponRig` at `CollisionShape3D` local ≈ (0.14, 0.85, 0.02)) is a first guess — adjust in-editor to Natalia's right hand pose.
 
 ### Phase 2 — Targets & damage (D4 part 1)
-- [ ] `health.gd` (signals: damaged, died, respawned) + `target_dummy.gd` (hit flash, knockdown tween, score, timed respawn; popup + fixed variants), `moving_target.gd` (simple rail back-and-forth), `destructible_prop.gd` (crates; gibbed into debris or simple hide+respawn).
-- [ ] `score_keeper.gd`: score/time/accuracy; end-of-run banner + restart (R on results or arena respawn button) reusing pause/restart patterns from GJDDM.
-- [ ] Damage popups & hitmarker states (hit/kill), headshot-style bonus via target zones if cheap.
-- **Acceptance:** shooting gallery flow: 60–90 s run, moving + static targets score points, props break, score persists across respawns, restart clean.
+- [x] `combat/health.gd` (signals: damaged/died; reset) + `combat/target_dummy.gd` (group `ShootableTargets`, hit flash, knockdown/sink tween, score, timed respawn; `moving` params = sine rail target) + `destructible_prop` via same script w/ crate scene (30 hp, style CRATE); prop respawn 4 s.
+- [x] `combat/score_keeper.gd` (group `ScoreKeeper`, score/shots/hits/accuracy, subscribes `WeaponRig.shot_fired`) + HUD score + hit/accuracy labels. Run timer / end-of-run banner / restart deferred to the Phase 3 arena pass.
+- [x] Damage popups (`FxBank.popup`, world Label3D, damage numbers + "+points" gold) & hitmarker flash (existing) — headshot zones skipped in favor of the moving-target bonus later.
+- [x] Bullet impact visibility: persistent-ish `FxBank.bullet_hole` decals on world surfaces + impact flash — "watch where bullets actually hit".
+- [x] Dev course in `shooter_range.tscn`: 3 static dummies, 1 moving target, 2 crates, ScoreKeeper.
+- **Acceptance:** ✅ Phase 2 harness PASS (21 checks: shoulder cam 0.55 & ADS recenter, dummy damaged/dead after 3 hits w/ popup, respawn full health, crate destroyed +50, score 150 total, accuracy 3/3, moving target oscillates; zero script errors). Range/testground/Welcome/Prototype still boot clean. Visual feel (popup size, decal look, target knockdown) needs one in-editor pass.
+
+**Phase 2 close-out notes:**
+- **Shoulder camera** (requested between phases): new derived `scripts/camera/shooter_camera.gd` (extends ThirdPersonCamera — honoring the TODO in the base file) adds lateral over-shoulder offset (0.55 m, eases to 0.3 while ADS) applied along the camera basis in `smooth_move_y`; base camera untouched (offset 0 default).
+- **Recoil rewritten** in `third_person_camera.gd`: old per-frame additive+decay integration was framerate-dependent (compounded to a permanent pitch climb in high-FPS runs); new version kicks instantly and eases back to the pre-shot aim orientation (`lerp_angle`), framerate independent.
+- **Recoil fixed again (post-playtest "aim locked after shooting")**: easing back to the *pre-shot aim snapshot* fought live mouse input — while firing or just after, the recovery spring dragged the view back toward where the first shot was fired, making the camera feel locked. Recoil is now modeled as a **kick offset that decays to zero** (`_recoil_offset`, capped at ±12°): only the kick is recovered, the player's own aim is never pulled. Verified by regression harness: kick + turn-away keeps the new yaw (1.196 rad held vs ~0.08 before), idle kicks still settle to the aim, 3 real shots land with zero drift.
+- **FX chain bug fixed**: `impact()` and `popup()` used `set_parallel(true)` with a trailing `tween_callback`, which fired immediately (parallel, zero duration) → impact flashes and damage popups freed themselves on the same frame; callbacks now go through `chain()`.
+- Owner added `weapons/rifle_colors.tscn` (+ `colors_assault_rifle/` folder) as a colored rifle variant — untouched; swap via `WeaponRig.gun_scene` if desired.
+- Rifle animation layer still pending (Rifle Idle already wired by owner as a Blend2 over `LocomotionBlend` under the FaceAdd chain — plan a dedicated additive "Combat" subtree + param driving in the polish pass).
 
 ### Phase 3 — Arena level, VN coexistence & fun pass (D1, D6)
 - [ ] `shooter_arena.tscn`: gallery with firing lanes/backstops from existing assets (`kenney_prototype_textures`, sample color textures, corridor GLBs as side dressing), cover props, spawn layout, lighting/environment copied from `_scenario_testground.tscn` patterns (sky, shadows; GL-compatible).

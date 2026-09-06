@@ -57,7 +57,7 @@ static func impact(parent: Node, position: Vector3, normal: Vector3) -> void:
 	tween.set_parallel(true)
 	tween.tween_method(func(s: float) -> void: mesh.scale = Vector3.ONE * s, 0.25, 1.0, 0.04)
 	tween.tween_method(func(a: float) -> void: mat.albedo_color = Color(1.0, 0.75, 0.3, a), 0.95, 0.0, IMPACT_LIFE)
-	tween.tween_callback(mesh.queue_free)
+	tween.chain().tween_callback(mesh.queue_free)
 
 
 static func muzzle_flash(anchor: Node3D) -> void:
@@ -71,3 +71,51 @@ static func muzzle_flash(anchor: Node3D) -> void:
 	var tween := light.create_tween()
 	tween.tween_property(light, "light_energy", 0.0, 0.06)
 	tween.tween_callback(light.queue_free)
+
+
+## Persistent-ish bullet hole decal on world surfaces (shows where shots land).
+static func bullet_hole(parent: Node, position: Vector3, normal: Vector3, life: float = 8.0) -> void:
+	if parent == null or not parent.is_inside_tree():
+		return
+	var holder := Node3D.new()
+	var mesh := MeshInstance3D.new()
+	var quad := QuadMesh.new()
+	quad.size = Vector2(0.08, 0.08)
+	var mat := StandardMaterial3D.new()
+	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	mat.albedo_color = Color(0.05, 0.05, 0.05, 0.85)
+	mat.roughness = 1.0
+	mesh.mesh = quad
+	mesh.material_override = mat
+	holder.add_child(mesh)
+	parent.add_child(holder)
+	holder.global_position = position + normal * 0.006
+	holder.look_at(position - normal, Vector3.UP) # quad +Z faces the surface normal
+	mesh.rotation.y = randf() * TAU # avoid identical orientations
+	var tween := holder.create_tween()
+	tween.tween_interval(maxf(0.0, life - 0.6))
+	tween.tween_method(func(a: float) -> void: mat.albedo_color = Color(0.05, 0.05, 0.05, a), 0.85, 0.0, 0.6)
+	tween.tween_callback(holder.queue_free)
+
+
+## Floating world-space text popup (damage numbers, score gains).
+static func popup(parent: Node, position: Vector3, text: String, color: Color) -> void:
+	if parent == null or not parent.is_inside_tree():
+		return
+	var label := Label3D.new()
+	label.text = text
+	label.font_size = 48
+	label.pixel_size = 0.004
+	label.modulate = color
+	label.outline_size = 12
+	label.outline_modulate = Color(0, 0, 0, 0.7)
+	label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	label.no_depth_test = true
+	parent.add_child(label)
+	label.global_position = position
+	var tween := label.create_tween()
+	tween.set_parallel(true)
+	tween.tween_property(label, "global_position:y", position.y + 0.6, 0.8).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tween.tween_method(func(a: float) -> void: label.modulate = Color(color.r, color.g, color.b, a), 1.0, 0.0, 0.8)
+	tween.chain().tween_callback(label.queue_free)
