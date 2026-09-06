@@ -1,20 +1,24 @@
 extends ActionNode
+class_name ActionRun
 
 ## Layered speed-modifier action (ACTION_ID "RUN").
 ##
 ## Framework usage (MCC): a layered ActionNode that plays on top of the
-## layered "MOVE" action. While the controller holds the run input, this node
-## re-feeds the active grounded movement state every frame with the same input
-## direction but a higher speed, so the movement state itself stays untouched.
+## layered "MOVE" action. Instead of racing MOVE over who writes the movement
+## speed last each frame (the controller re-sends the base speed on every
+## frame), this action toggles a multiplier that the movement state itself
+## consumes when converting input into velocity (see
+## MovementGroundedComplex.speed_multiplier). play() raises it, stop() lowers
+## it back to 1.0 — no per-frame work needed and no ordering assumptions.
 ##
-## Placement: as a child of the character ActionContainer, AFTER the Move node
-## (tree order decides which node writes the movement state last each frame).
-## The controller already sends play/stop "RUN" via the existing input map.
+## The controller polls the run input every frame and calls play_action("RUN")
+## / stop_action("RUN") accordingly, so play/stop must be idempotent.
 
-@export var run_speed: float = 5.5
+## How much faster the character moves while running (multiplied into the
+## character's base movement speed, e.g. 2.0 -> 3.5 with 1.75).
+@export var speed_multiplier: float = 1.75
 
-var _movement_class: MovementState
-var _movement_manager: MovementStateManager
+var _movement_class: MovementGroundedComplex
 
 
 func _init() -> void:
@@ -25,26 +29,43 @@ func _init() -> void:
 func _ready() -> void:
 	# ActionContainer children live one level below the character root.
 	var character: Node = get_parent().get_parent()
-	_movement_class = character.find_child("GroundedMovement", false)
-	if not _movement_class:
-		_movement_manager = character.find_child("MovementManager", false)
-		if _movement_manager:
-			_movement_class = _movement_manager.find_child("GroundedMovement", false)
+	var grounded: Node = character.find_child("GroundedMovement", false)
+	if grounded is MovementGroundedComplex:
+		_movement_class = grounded
+	else:
+		var manager: Node = character.find_child("MovementManager", false)
+		grounded = manager.find_child("GroundedMovement", false) if manager else null
+		if grounded is MovementGroundedComplex:
+			_movement_class = grounded
 
 
 func can_play() -> bool:
 	if not is_enabled:
 		return false
-	# Running only makes sense in a grounded movement state (mirrors Move/Fly actions).
-	if _movement_manager and _movement_manager.active_state.name != "GroundedMovement":
+	if _movement_class == null:
+		return false
+	# Running only makes sense while the grounded movement state is active.
+	var manager: MovementStateManager = _movement_class.get_parent() as MovementStateManager
+	if manager and manager.active_state != _movement_class:
 		return false
 	return true
 
+
 func play(_params: Dictionary = {}) -> void:
-	# Add extra speed multiplier. 
-	print("Running")
-	
+	if is_playing:
+		return # controller polls RUN every frame while held
+	_movement_class.speed_multiplier = speed_multiplier
+	super.play()
+
+
 func stop() -> void:
-	# Back to normal speed multiplier. 
-	pass
-	
+	if not is_playing:
+		return
+	_movement_class.speed_multiplier = 1.0
+	super.stop()
+
+
+func _exit_tree() -> void:
+	# Safety net: never leave a character running if this node is removed/reconfigured.
+	if _movement_class and _movement_class.speed_multiplier != 1.0:
+		_movement_class.speed_multiplier = 1.0

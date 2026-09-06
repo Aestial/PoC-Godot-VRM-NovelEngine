@@ -69,7 +69,7 @@ script = ExtResource("9_bbd2j")
 
 [node name="Run" type="Node" parent="ActionContainer" unique_id=1990964590]
 script = ExtResource("7_sel01")
-run_speed = 6.0
+speed_multiplier = 2.0
 
 [node name="AnimationTree" type="AnimationTree" parent="." unique_id=835141688]
 root_node = NodePath("../CollisionShape3D/ModelContainer/DoritaCorona")
@@ -78,7 +78,7 @@ anim_player = NodePath("../CollisionShape3D/ModelContainer/DoritaCorona/Animatio
 parameters/BaseEmotion/blend_position = Vector2(-0.257, -0.482)
 parameters/Locomotion/conditions/JUMP = false
 parameters/Locomotion/Jump/blend_position = 0.0
-parameters/Locomotion/Motion/blend_position = 0.082779706
+parameters/Locomotion/Motion/blend_position = 0.0
 parameters/FaceAdd/add_amount = 0.9
 parameters/FaceExpression/mood/current_state = "sad"
 parameters/FaceExpression/mood/transition_request = ""
