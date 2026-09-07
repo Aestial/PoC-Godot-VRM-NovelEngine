@@ -11,12 +11,13 @@
 [ext_resource type="Script" uid="uid://d1hjmb7cly4p5" path="res://samples/shooter_demo/scripts/camera/shooter_camera.gd" id="9_cam"]
 [ext_resource type="PackedScene" uid="uid://csd375f4ra5qj" path="res://samples/shooter_demo/weapons/rifle_colors.tscn" id="10_dcgaf"]
 [ext_resource type="AnimationNodeBlendTree" uid="uid://dx2b4jcb4wi7y" path="res://samples/shooter_demo/animations/shooter-combat_blendtree.tres" id="11_tree"]
-[ext_resource type="Script" path="res://samples/shooter_demo/scripts/combat/health.gd" id="12_hp"]
+[ext_resource type="Script" uid="uid://mlp5fhr452vp" path="res://samples/shooter_demo/scripts/combat/health.gd" id="12_hp"]
+[ext_resource type="Script" uid="uid://cjoonm2towqjl" path="res://samples/shooter_demo/scripts/ui/health_bar_3d.gd" id="13_bar"]
 
 [sub_resource type="Resource" id="Resource_yj6sg"]
 script = ExtResource("8_5eass")
 damage = 30.0
-reload_time = 3.0
+reload_time = 1.7
 spread_degrees = 1.0
 aim_spread_degrees = 0.3
 recoil_pitch = 0.8
@@ -52,8 +53,8 @@ parameters/Locomotion/conditions/RELOADING = false
 parameters/Locomotion/Aim/blend_position = 0.0
 parameters/Locomotion/Motion/blend_position = 0.7935813
 parameters/FaceExpression/mood_amount/blend_amount = 1.0
-parameters/LeftBlink/blend_position = 0.0
-parameters/RightBlink/blend_position = 0.0019588881897986384
+parameters/LeftBlink/blend_position = 0.1602300000000001
+parameters/RightBlink/blend_position = 0.1602300000000001
 parameters/LocomotionBlend/blend_amount = 1.0
 parameters/Pose/current_index = 1
 parameters/DancingSpeed/scale = 0.8800000000000026
@@ -95,5 +96,10 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.72)
 [node name="GazeTarget" parent="." index="5" unique_id=1950633892]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3480654, -0.75)
 
-[node name="Health" type="Node" parent="."]
+[node name="Health" type="Node" parent="." index="9" unique_id=1026583951]
 script = ExtResource("12_hp")
+
+[node name="HealthBar" type="Node3D" parent="." index="10" unique_id=1330065647]
+script = ExtResource("13_bar")
+caption = "YOU"
+show_only_when_hurt = true

@@ -10,11 +10,14 @@ const BSOD: PackedScene = preload("res://samples/shooter_demo/scenes/enemies/bso
 const BLISS: PackedScene = preload("res://samples/shooter_demo/scenes/enemies/bliss_enemy.tscn")
 const ERROR: PackedScene = preload("res://samples/shooter_demo/scenes/enemies/error_enemy.tscn")
 const WOUNDED_ALLY: PackedScene = preload("res://samples/shooter_demo/scenes/wounded_ally.tscn")
+const AMMO_PICKUP: PackedScene = preload("res://samples/shooter_demo/scenes/pickups/ammo_pickup.tscn")
 
-const SPAWN_RADIUS_MIN := 16.0
-const SPAWN_RADIUS_MAX := 20.0
+const SPAWN_RADIUS_MIN := 26.0
+const SPAWN_RADIUS_MAX := 34.0
 
 @export var player_path: NodePath
+## The arena is a level: this many rounds, then a win state.
+@export var total_rounds: int = 3
 
 var _player: Node3D
 var _player_health: Node
@@ -22,6 +25,7 @@ var _round: int = 0
 var _killed: int = 0
 var _round_count: int = 0
 var _running: bool = false
+var finished: bool = false
 
 var _banner: Label
 var _wave_label: Label
@@ -38,6 +42,9 @@ func _ready() -> void:
 			_player_health.died.connect(_on_player_died)
 			_player_health.damaged.connect(_on_player_damaged)
 	_spawn_ally()
+	for pos in [Vector3(-6, 0.35, -8), Vector3(6, 0.35, 10), Vector3(-9, 0.35, 12)]:
+		_spawn_ammo_pickup(pos)
+	_replenish_pickups()
 	_start_round(1)
 
 
@@ -88,6 +95,8 @@ func _build_ui() -> void:
 
 
 func _start_round(round: int) -> void:
+	if finished:
+		return
 	_round = round
 	_round_count = mini(2 + round * 2, 14)
 	_killed = 0
@@ -113,7 +122,10 @@ func _spawn_wave() -> void:
 	_show_banner("FLOOR CLEARED", "IT GETS WORSE WHEN YOU REMEMBER THEIR NAMES", 2.2)
 	await get_tree().create_timer(2.6).timeout
 	if _running:
-		_start_round(_round + 1)
+		if _round >= total_rounds:
+			_on_victory()
+		else:
+			_start_round(_round + 1)
 
 
 func _spawn_enemy() -> void:
@@ -125,6 +137,22 @@ func _spawn_enemy() -> void:
 	enemy.global_position = Vector3(cos(angle) * radius, 0.0, sin(angle) * radius)
 	enemy.set("player_path", _player.get_path())
 	enemy.downed.connect(_on_enemy_down)
+
+
+func _spawn_ammo_pickup(pos: Vector3) -> void:
+	var pick := AMMO_PICKUP.instantiate()
+	$Pickups.add_child(pick)
+	pick.global_position = pos
+
+
+func _replenish_pickups() -> void:
+	while is_inside_tree():
+		await get_tree().create_timer(12.0).timeout
+		if not _running:
+			return
+		if get_tree().get_nodes_in_group("AmmoPickups").size() < 4:
+			var angle := randf() * TAU
+			_spawn_ammo_pickup(Vector3(cos(angle) * randf_range(10.0, 22.0), 0.35, sin(angle) * randf_range(10.0, 22.0)))
 
 
 func _pick_enemy_scene() -> PackedScene:
@@ -151,7 +179,18 @@ func _on_player_damaged(_amount: int, _hit: Dictionary) -> void:
 	_flash_tween.tween_property(_flash, "color:a", 0.0, 0.45)
 
 
+func _on_victory() -> void:
+	_running = false
+	finished = true
+	_wave_label.text = "LEVEL CLEARED — ESC for menu"
+	_show_banner("THE DREAM ENDS", "you finally remembered to log off", 7.0)
+	# Leave the arena running so the player can walk the cleared floor.
+	get_tree().paused = false
+
+
 func _on_player_died(_hit: Dictionary) -> void:
+	if finished:
+		return
 	_running = false
 	_show_banner("TERMINATED", "you were always the error message", 3.0)
 	await get_tree().create_timer(2.8).timeout
@@ -159,7 +198,7 @@ func _on_player_died(_hit: Dictionary) -> void:
 
 
 func _on_ally_died(_hit: Dictionary) -> void:
-	if not _running:
+	if not _running or finished:
 		return
 	_running = false
 	_show_banner("SHE DIDN'T WAKE UP", "some people stay logged in forever", 3.0)

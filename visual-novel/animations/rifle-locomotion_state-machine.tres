@@ -49,7 +49,7 @@ max_space = 2.0
 sync = true
 
 [sub_resource type="AnimationNodeAnimation" id="Anim_reload"]
-animation = &"rifle-shooting-mvc/Reloading"
+animation = &"rifle_fast_reload/Reloading"
 
 [sub_resource type="AnimationNodeStateMachineTransition" id="Tr_enter"]
 advance_mode = 2

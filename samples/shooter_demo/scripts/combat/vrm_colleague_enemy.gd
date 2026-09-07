@@ -2,12 +2,15 @@ extends Node3D
 class_name VrmColleagueEnemy
 
 ## VRM colleague enemy: builds a NovelCharacter at runtime (like ShooterPlayer),
-## swaps in a packed VRM colleague (georgino), then drives it zombie-style
-## through its own MCC ActionContainer toward the nearest living victim
-## (player or the wounded ally).
+## swaps in a packed VRM colleague (georgino) and points its AnimationTree at
+## the colleague clone of the working novel blend tree. Movement is driven
+## through the standard MCC path (ActionContainer "MOVE" per frame → the
+## character's own physics + animation tree), so walking and stopping behave
+## exactly like every other NovelCharacter NPC. Attack/death states will be
+## added to the colleague tree later (owner provides the clips).
 ##
 ## The inner character leaves the ControllableCharacter group so bullets can
-## hit it; its Dialogic interaction layer is disabled and it joins
+## hit it; its Dialogic interaction layer is disabled; it joins
 ## ShootableTargets/Enemies to reuse the whole damage/score pipeline.
 
 signal downed(target: Node)
@@ -15,10 +18,9 @@ signal downed(target: Node)
 const NOVEL_BASE: PackedScene = preload("res://visual-novel/characters/novel_character_base.tscn")
 const GEORGINO_MODEL: PackedScene = preload("res://visual-novel/GJDDM/characters/packed/georgino.scn")
 const GEORGINO_DCH: Resource = preload("res://dialogic/characters/Georgino.dch")
-
 @export var points: int = 150
 @export var chase_speed: float = 2.4
-@export var attack_range: float = 1.35
+@export var attack_range: float = 1.4
 @export var attack_damage: int = 10
 @export var attack_interval: float = 1.0
 @export var player_path: NodePath
@@ -41,29 +43,44 @@ func _ready() -> void:
 
 func _build_inner() -> void:
 	_inner = NOVEL_BASE.instantiate() as NovelCharacter
-	$Character.add_child(_inner)
-	# Same config dance as ShooterPlayer: swap the model + dialogic identity.
+	add_child(_inner)
+	# Same config dance as ShooterPlayer: swap model + identity.
 	_inner.character_type = NovelCharacter.CharacterType.NPC
 	_inner.has_monologue = false
 	_inner.dialogic_character = GEORGINO_DCH
 	_inner.vrm_scene = GEORGINO_MODEL
 	_inner.default_pose_amount = 0.0
 	_inner.speed = chase_speed
-	# Puppet mode: we drive position + animation directly (robotic walker);
-	# disable the inner body's own physics so it never fights the wrapper.
-	var grounded := _inner.get_node("MovementManager/GroundedMovement")
-	grounded.exit()
 	_inner.remove_from_group("ControllableCharacter")
 	var area := _inner.collision_shape.get_node_or_null("InteractionArea3D")
 	if area:
 		(area as Area3D).monitoring = false
 		(area as Area3D).monitorable = false
-	# NovelCharacter rewires the AnimationPlayer on model swap; make the tree
-	# root follow the real model root (name differs per VRM pack).
-	call_deferred("_repair_animation_root")
-	await get_tree().create_timer(0.1).timeout
-	if is_inside_tree():
-		_repair_animation_root()
+	# Tiny drop-in so the character's own physics settles it on the floor.
+	_inner.position.y = 0.25
+	# The inner character already runs the standard novel blend tree (the one
+	# every VN NPC uses). Just re-anchor it to the real model root and force
+	# the locomotion path; a colleague-specific clone can come later with the
+	# attack/death states.
+	var tree: AnimationTree = _inner.get_node("AnimationTree")
+	_reset_pose(tree)
+	call_deferred("_finish_setup")
+
+
+func _finish_setup() -> void:
+	if not is_inside_tree():
+		return
+	var tree: AnimationTree = _inner.get_node("AnimationTree")
+	_reset_pose(tree)
+	_repair_animation_root()
+
+
+func _reset_pose(tree: AnimationTree) -> void:
+	tree.set("parameters/LocomotionBlend/blend_amount", 1.0)
+	tree.set("parameters/Locomotion/conditions/JUMP", false)
+	tree.set("parameters/Locomotion/Motion/blend_position", -0.1)
+	if tree.has_method("set_pose"):
+		tree.set_pose("idle", 0.0)
 
 
 func _repair_animation_root() -> void:
@@ -72,7 +89,7 @@ func _repair_animation_root() -> void:
 	if tree == null or model_container == null:
 		return
 	for child in model_container.get_children():
-		if not child.find_children("*", "Skeleton3D", true, false).is_empty():
+		if child.find_children("*", "Skeleton3D", true, false).is_empty() == false:
 			tree.root_node = tree.get_path_to(child)
 			return
 
@@ -96,13 +113,12 @@ func _on_died(_hit: Dictionary) -> void:
 	_inner.collision_layer = 0
 	var container := _inner.get_node("ActionContainer")
 	container.play_action("MOVE", {"input_direction": Vector3.ZERO})
-	container.stop_action("MOVE")
 	var sk := get_tree().get_first_node_in_group("ScoreKeeper")
 	if sk and sk.has_method("register_down"):
 		sk.register_down(self)
 	var pos: Vector3 = _inner.global_position + Vector3.UP * 1.4
 	FxBank.popup(get_tree().current_scene, pos, "+%d" % points, Color(0.85, 0.8, 0.4))
-	# Robotic shutdown: tilt, sink, remove.
+	# Death anim pending from the owner; tilt-and-sink until the clip arrives.
 	var tween := create_tween()
 	tween.set_parallel(true)
 	tween.tween_property(_inner, "rotation", Vector3(deg_to_rad(-80.0), 0, 0), 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
@@ -116,35 +132,31 @@ func _physics_process(delta: float) -> void:
 		return
 	_resolve_target()
 	if _target == null or not is_instance_valid(_target):
-		_set_anim_speed(0.0)
+		_stop_moving()
 		return
 	if _attack_cooldown > 0.0:
 		_attack_cooldown = maxf(0.0, _attack_cooldown - delta)
 
-	var to_target := _target.global_position - global_position
+	var to_target := _target.global_position - _inner.global_position
 	to_target.y = 0.0
 	var dist := to_target.length()
+	var container := _inner.get_node("ActionContainer")
 	if dist > attack_range and dist > 0.01:
-		var dir_n := to_target.normalized()
-		global_position += dir_n * chase_speed * delta
-		_inner.collision_shape.rotation.y = atan2(-dir_n.x, -dir_n.z)
-		_set_anim_speed(chase_speed)
+		# Standard NPC-style drive: the character's own movement state + the
+		# colleague tree turn this into walking toward the victim.
+		container.play_action("MOVE", {"input_direction": to_target.normalized()})
 	else:
-		_set_anim_speed(0.0)
+		container.play_action("MOVE", {"input_direction": Vector3.ZERO})
 		if dist > 0.01 and _attack_cooldown <= 0.0:
 			_attack_target()
 			_attack_cooldown = attack_interval
 
 
-## Robot locomotion: mirror the rifle-tree Motion blend values for a walking
-## cycle; no CharacterBody physics involved (puppet mode).
-func _set_anim_speed(speed: float) -> void:
-	var tree := _inner.get_node_or_null("AnimationTree")
-	if tree == null:
+func _stop_moving() -> void:
+	if not is_instance_valid(_inner):
 		return
-	tree.set("parameters/LocomotionBlend/blend_amount", 1.0)
-	tree.set("parameters/Locomotion/conditions/JUMP", false)
-	tree.set("parameters/Locomotion/Motion/blend_position", remap(speed, 0.15, 1.5, 0.0, 1.0))
+	var container := _inner.get_node("ActionContainer")
+	container.play_action("MOVE", {"input_direction": Vector3.ZERO})
 
 
 func _attack_target() -> void:
@@ -157,8 +169,9 @@ func _resolve_target() -> void:
 	var player := get_node_or_null(player_path) if not player_path.is_empty() else null
 	var best: Node3D = player as Node3D
 	var best_dist := INF
+	var origin: Vector3 = _inner.global_position if is_instance_valid(_inner) else global_position
 	if best and is_instance_valid(best):
-		best_dist = best.global_position.distance_to(_inner.global_position)
+		best_dist = best.global_position.distance_to(origin)
 	for ally in get_tree().get_nodes_in_group("Allies"):
 		var node := ally as Node3D
 		if node == null or not is_instance_valid(node):
@@ -166,7 +179,7 @@ func _resolve_target() -> void:
 		var ally_health := node.get_node_or_null("Health")
 		if ally_health and ally_health.get("is_dead"):
 			continue
-		var d := node.global_position.distance_to(_inner.global_position)
+		var d := node.global_position.distance_to(origin)
 		if d < best_dist:
 			best_dist = d
 			best = node

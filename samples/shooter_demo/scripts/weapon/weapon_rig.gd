@@ -58,6 +58,7 @@ var _skeleton: Skeleton3D
 var _hand_bone: int = -1
 var _socket_local: Transform3D
 var _anim_tree: AnimationTree
+var _fast_reload_checked: bool = false
 
 var _fire_cooldown: float = 0.0
 var _spread_bloom: float = 0.0
@@ -134,6 +135,7 @@ func _process(delta: float) -> void:
 		_resolve_hand_socket()
 	if _anim_tree == null:
 		_anim_tree = _character.get_node_or_null("AnimationTree") as AnimationTree
+	_ensure_fast_reload_library()
 
 	if _fire_cooldown > 0.0:
 		_fire_cooldown = maxf(0.0, _fire_cooldown - delta)
@@ -173,6 +175,15 @@ func can_fire_now() -> bool:
 func can_reload() -> bool:
 	return not is_reloading and ammo_in_mag < _config.mag_size and reserve_ammo > 0
 
+## Ammo pickup hook: refills reserve ammunition (capped so pickups stay useful
+## but never trivialize the mag economy).
+func add_reserve(amount: int) -> void:
+	if amount <= 0:
+		return
+	reserve_ammo = mini(reserve_ammo + amount, _config.reserve_size * 3)
+	ammo_changed.emit(ammo_in_mag, reserve_ammo)
+
+
 func get_state() -> Dictionary:
 	return {
 		"ammo": ammo_in_mag,
@@ -202,6 +213,32 @@ func start_reload() -> void:
 func cancel_reload() -> void:
 	if is_reloading:
 		is_reloading = false
+
+
+## Creates a runtime 2x-faster copy of the reload clip ("rifle_fast_reload/
+## Reloading") on the model's AnimationPlayer, so the reload animation and the
+## gameplay reload_time both take ~half the time.
+func _ensure_fast_reload_library() -> void:
+	if _fast_reload_checked:
+		return
+	_fast_reload_checked = true
+	const LIB_NAME := &"rifle_fast_reload"
+	var player := _character.find_child("AnimationPlayer", true, false) as AnimationPlayer
+	if player == null:
+		return
+	if player.has_animation_library(LIB_NAME):
+		return
+	var src_name := "rifle-shooting-mvc/Reloading"
+	if not player.has_animation(src_name):
+		return
+	var dup := (player.get_animation(src_name) as Animation).duplicate(true) as Animation
+	for track in dup.get_track_count():
+		for key in dup.track_get_key_count(track):
+			dup.track_set_key_time(track, key, dup.track_get_key_time(track, key) * 0.5)
+	dup.length *= 0.5
+	var lib := AnimationLibrary.new()
+	lib.add_animation("Reloading", dup)
+	player.add_animation_library(LIB_NAME, lib)
 
 
 func set_aim_active(active: bool) -> void:
