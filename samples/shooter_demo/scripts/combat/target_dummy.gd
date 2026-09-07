@@ -112,6 +112,10 @@ func _down_tween() -> void:
 			tween.tween_property(self, "position:y", _base_position.y - 1.6, 0.5)
 	await tween.finished
 	visible = false
+	if respawn_time <= 0.0:
+		# Permanent targets (e.g. enemies) remove themselves when downed.
+		queue_free()
+		return
 	await get_tree().create_timer(respawn_time).timeout
 	if is_inside_tree():
 		_respawn()

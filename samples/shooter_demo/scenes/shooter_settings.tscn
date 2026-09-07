@@ -12,40 +12,105 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -240.0
-offset_top = -220.0
-offset_right = 240.0
-offset_bottom = 220.0
+offset_left = -280.0
+offset_top = -280.0
+offset_right = 280.0
+offset_bottom = 280.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 0
 
 [node name="Margin" type="MarginContainer" parent="Panel"]
 layout_mode = 2
-theme_override_constants/margin_left = 24
-theme_override_constants/margin_top = 16
-theme_override_constants/margin_right = 24
-theme_override_constants/margin_bottom = 16
+theme_override_constants/margin_left = 28
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 28
+theme_override_constants/margin_bottom = 18
 
-[node name="VBox" type="VBoxContainer" parent="Panel/Margin"]
+[node name="Main" type="VBoxContainer" parent="Panel/Margin"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Title" type="Label" parent="Panel/Margin/VBox"]
+[node name="Title" type="Label" parent="Panel/Margin/Main"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 26
-text = "Settings (ESC)"
+theme_override_font_sizes/font_size = 34
+text = "PAUSED"
 horizontal_alignment = 1
 
-[node name="RowDistance" type="HBoxContainer" parent="Panel/Margin/VBox"]
+[node name="Resume" type="Button" parent="Panel/Margin/Main"]
+layout_mode = 2
+text = "Resume (ESC)"
+
+[node name="Restart" type="Button" parent="Panel/Margin/Main"]
+layout_mode = 2
+text = "Restart Run"
+
+[node name="SettingsButton" type="Button" parent="Panel/Margin/Main"]
+layout_mode = 2
+text = "Settings"
+
+[node name="DebugButton" type="Button" parent="Panel/Margin/Main"]
+layout_mode = 2
+text = "Debug (Developer)"
+
+[node name="Quit" type="Button" parent="Panel/Margin/Main"]
+layout_mode = 2
+text = "Quit"
+
+[node name="Settings" type="VBoxContainer" parent="Panel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Title" type="Label" parent="Panel/Margin/Settings"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "SETTINGS"
+horizontal_alignment = 1
+
+[node name="RowVolume" type="HBoxContainer" parent="Panel/Margin/Settings"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="Panel/Margin/VBox/RowDistance"]
+[node name="Label" type="Label" parent="Panel/Margin/Settings/RowVolume"]
 layout_mode = 2
-custom_minimum_size = Vector2(130, 0)
+custom_minimum_size = Vector2(180, 0)
+text = "Master volume"
+
+[node name="Slider" type="HSlider" parent="Panel/Margin/Settings/RowVolume"]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = -40.0
+max_value = 0.0
+step = 1.0
+value = 0.0
+
+[node name="Value" type="Label" parent="Panel/Margin/Settings/RowVolume"]
+layout_mode = 2
+custom_minimum_size = Vector2(90, 0)
+text = "0 dB"
+horizontal_alignment = 2
+
+[node name="Back" type="Button" parent="Panel/Margin/Settings"]
+layout_mode = 2
+text = "Back"
+
+[node name="Debug" type="VBoxContainer" parent="Panel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Title" type="Label" parent="Panel/Margin/Debug"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "DEBUG (DEVELOPER)"
+horizontal_alignment = 1
+
+[node name="RowDistance" type="HBoxContainer" parent="Panel/Margin/Debug"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Panel/Margin/Debug/RowDistance"]
+layout_mode = 2
+custom_minimum_size = Vector2(180, 0)
 text = "Camera distance"
 
-[node name="Slider" type="HSlider" parent="Panel/Margin/VBox/RowDistance"]
+[node name="Slider" type="HSlider" parent="Panel/Margin/Debug/RowDistance"]
 layout_mode = 2
 size_flags_horizontal = 3
 min_value = 0.6
@@ -53,21 +118,21 @@ max_value = 6.0
 step = 0.05
 value = 2.4
 
-[node name="Value" type="Label" parent="Panel/Margin/VBox/RowDistance"]
+[node name="Value" type="Label" parent="Panel/Margin/Debug/RowDistance"]
 layout_mode = 2
-custom_minimum_size = Vector2(80, 0)
+custom_minimum_size = Vector2(90, 0)
 text = "2.4 m"
 horizontal_alignment = 2
 
-[node name="RowShoulder" type="HBoxContainer" parent="Panel/Margin/VBox"]
+[node name="RowShoulder" type="HBoxContainer" parent="Panel/Margin/Debug"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="Panel/Margin/VBox/RowShoulder"]
+[node name="Label" type="Label" parent="Panel/Margin/Debug/RowShoulder"]
 layout_mode = 2
-custom_minimum_size = Vector2(130, 0)
+custom_minimum_size = Vector2(180, 0)
 text = "Shoulder offset"
 
-[node name="Slider" type="HSlider" parent="Panel/Margin/VBox/RowShoulder"]
+[node name="Slider" type="HSlider" parent="Panel/Margin/Debug/RowShoulder"]
 layout_mode = 2
 size_flags_horizontal = 3
 min_value = -1.5
@@ -75,21 +140,21 @@ max_value = 1.5
 step = 0.05
 value = 0.35
 
-[node name="Value" type="Label" parent="Panel/Margin/VBox/RowShoulder"]
+[node name="Value" type="Label" parent="Panel/Margin/Debug/RowShoulder"]
 layout_mode = 2
-custom_minimum_size = Vector2(80, 0)
+custom_minimum_size = Vector2(90, 0)
 text = "0.35"
 horizontal_alignment = 2
 
-[node name="RowSens" type="HBoxContainer" parent="Panel/Margin/VBox"]
+[node name="RowSens" type="HBoxContainer" parent="Panel/Margin/Debug"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="Panel/Margin/VBox/RowSens"]
+[node name="Label" type="Label" parent="Panel/Margin/Debug/RowSens"]
 layout_mode = 2
-custom_minimum_size = Vector2(130, 0)
+custom_minimum_size = Vector2(180, 0)
 text = "Mouse sensitivity"
 
-[node name="Slider" type="HSlider" parent="Panel/Margin/VBox/RowSens"]
+[node name="Slider" type="HSlider" parent="Panel/Margin/Debug/RowSens"]
 layout_mode = 2
 size_flags_horizontal = 3
 min_value = 0.0005
@@ -97,34 +162,34 @@ max_value = 0.02
 step = 0.0005
 value = 0.005
 
-[node name="Value" type="Label" parent="Panel/Margin/VBox/RowSens"]
+[node name="Value" type="Label" parent="Panel/Margin/Debug/RowSens"]
 layout_mode = 2
-custom_minimum_size = Vector2(80, 0)
+custom_minimum_size = Vector2(90, 0)
 text = "0.005"
 horizontal_alignment = 2
 
-[node name="RowAdsFov" type="HBoxContainer" parent="Panel/Margin/VBox"]
+[node name="RowAdsFov" type="HBoxContainer" parent="Panel/Margin/Debug"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="Panel/Margin/VBox/RowAdsFov"]
+[node name="Label" type="Label" parent="Panel/Margin/Debug/RowAdsFov"]
 layout_mode = 2
-custom_minimum_size = Vector2(130, 0)
+custom_minimum_size = Vector2(180, 0)
 text = "ADS FOV"
 
-[node name="Slider" type="HSlider" parent="Panel/Margin/VBox/RowAdsFov"]
+[node name="Slider" type="HSlider" parent="Panel/Margin/Debug/RowAdsFov"]
 layout_mode = 2
 size_flags_horizontal = 3
 min_value = 30.0
 max_value = 80.0
 step = 1.0
-value = 42.0
+value = 40.0
 
-[node name="Value" type="Label" parent="Panel/Margin/VBox/RowAdsFov"]
+[node name="Value" type="Label" parent="Panel/Margin/Debug/RowAdsFov"]
 layout_mode = 2
-custom_minimum_size = Vector2(80, 0)
-text = "42 fov"
+custom_minimum_size = Vector2(90, 0)
+text = "40 fov"
 horizontal_alignment = 2
 
-[node name="Resume" type="Button" parent="Panel/Margin/VBox"]
+[node name="Back" type="Button" parent="Panel/Margin/Debug"]
 layout_mode = 2
-text = "Resume (ESC)"
+text = "Back"

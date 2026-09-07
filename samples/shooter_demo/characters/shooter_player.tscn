@@ -11,6 +11,7 @@
 [ext_resource type="Script" uid="uid://d1hjmb7cly4p5" path="res://samples/shooter_demo/scripts/camera/shooter_camera.gd" id="9_cam"]
 [ext_resource type="PackedScene" uid="uid://csd375f4ra5qj" path="res://samples/shooter_demo/weapons/rifle_colors.tscn" id="10_dcgaf"]
 [ext_resource type="AnimationNodeBlendTree" uid="uid://dx2b4jcb4wi7y" path="res://samples/shooter_demo/animations/shooter-combat_blendtree.tres" id="11_tree"]
+[ext_resource type="Script" path="res://samples/shooter_demo/scripts/combat/health.gd" id="12_hp"]
 
 [sub_resource type="Resource" id="Resource_yj6sg"]
 script = ExtResource("8_5eass")
@@ -93,3 +94,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.72)
 
 [node name="GazeTarget" parent="." index="5" unique_id=1950633892]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3480654, -0.75)
+
+[node name="Health" type="Node" parent="."]
+script = ExtResource("12_hp")

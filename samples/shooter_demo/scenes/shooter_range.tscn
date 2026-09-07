@@ -1,27 +1,14 @@
 [gd_scene format=3 uid="uid://blaotcm62cyv6"]
 
+[ext_resource type="Environment" uid="uid://cu5pj0xssty3a" path="res://samples/shooter_demo/scenes/sunny-cloud_environment.tres" id="1_3yw52"]
 [ext_resource type="PackedScene" path="res://samples/shooter_demo/scenes/shooter_hud.tscn" id="1_hud"]
 [ext_resource type="PackedScene" uid="uid://cjxe0v2258fy1" path="res://samples/shooter_demo/characters/shooter_player.tscn" id="2_player"]
 [ext_resource type="Script" uid="uid://caigcps64adue" path="res://samples/shooter_demo/scripts/controllers/controller_player_shooter.gd" id="3_ctrl"]
 [ext_resource type="Script" uid="uid://cdhj5gruoyjwg" path="res://visual-novel/scripts/actions/pointer_capture.gd" id="4_ptr"]
-[ext_resource type="Texture2D" uid="uid://doyodkg1ds7td" path="res://samples/controller_examples/assets/textures/Sky.png" id="5_sky"]
 [ext_resource type="PackedScene" path="res://samples/shooter_demo/scenes/target_dummy.tscn" id="6_dummy"]
 [ext_resource type="PackedScene" path="res://samples/shooter_demo/scenes/prop_crate.tscn" id="7_crate"]
 [ext_resource type="Script" uid="uid://cuqj7p44stre8" path="res://samples/shooter_demo/scripts/combat/score_keeper.gd" id="8_sk"]
 [ext_resource type="PackedScene" path="res://samples/shooter_demo/scenes/shooter_settings.tscn" id="9_settings"]
-
-[sub_resource type="PanoramaSkyMaterial" id="sky_mat"]
-panorama = ExtResource("5_sky")
-
-[sub_resource type="Sky" id="sky"]
-sky_material = SubResource("sky_mat")
-
-[sub_resource type="Environment" id="env"]
-background_mode = 2
-background_energy_multiplier = 0.9
-sky = SubResource("sky")
-tonemap_mode = 3
-glow_enabled = true
 
 [sub_resource type="StandardMaterial3D" id="mat_plank_a"]
 albedo_color = Color(0.9, 0.35, 0.3, 1)
@@ -38,7 +25,7 @@ roughness = 0.7
 [node name="ShooterRange" type="Node3D" unique_id=1301017487]
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1660191013]
-environment = SubResource("env")
+environment = ExtResource("1_3yw52")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1293569092]
 transform = Transform3D(-0.866026, -0.433013, 0.249999, 0.5, -0.75, 0.433012, -1.3411e-07, 0.499999, 0.866026, 0, 0, 0)
@@ -164,5 +151,5 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.5, 0.5, -15.5)
 [node name="ScoreKeeper" type="Node" parent="." unique_id=1387979363]
 script = ExtResource("8_sk")
 
-[node name="Settings" parent="." instance=ExtResource("9_settings")]
+[node name="Settings" parent="." unique_id=1882140452 instance=ExtResource("9_settings")]
 player_path = NodePath("../Characters/Player")
