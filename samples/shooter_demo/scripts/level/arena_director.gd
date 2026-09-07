@@ -5,10 +5,11 @@ class_name ArenaDirector
 ## rounds, tracks kills, shows banners, flashes red when the player is hit and
 ## auto-restarts the arena when the player dies.
 
-const COLLEAGUE: PackedScene = preload("res://samples/shooter_demo/scenes/enemies/colleague_enemy.tscn")
+const VRM_COLLEAGUE: PackedScene = preload("res://samples/shooter_demo/scenes/enemies/vrm_colleague_enemy.tscn")
 const BSOD: PackedScene = preload("res://samples/shooter_demo/scenes/enemies/bsod_enemy.tscn")
 const BLISS: PackedScene = preload("res://samples/shooter_demo/scenes/enemies/bliss_enemy.tscn")
 const ERROR: PackedScene = preload("res://samples/shooter_demo/scenes/enemies/error_enemy.tscn")
+const WOUNDED_ALLY: PackedScene = preload("res://samples/shooter_demo/scenes/wounded_ally.tscn")
 
 const SPAWN_RADIUS_MIN := 16.0
 const SPAWN_RADIUS_MAX := 20.0
@@ -36,7 +37,21 @@ func _ready() -> void:
 		if _player_health:
 			_player_health.died.connect(_on_player_died)
 			_player_health.damaged.connect(_on_player_damaged)
+	_spawn_ally()
 	_start_round(1)
+
+
+## The wounded co-worker to defend: speaks when you get close, dies for real.
+func _spawn_ally() -> void:
+	var allies := Node3D.new()
+	allies.name = "Allies"
+	add_child(allies)
+	var ally := WOUNDED_ALLY.instantiate()
+	allies.add_child(ally)
+	ally.global_position = Vector3(-6.0, 0.0, 4.0)
+	ally.set("player_path", _player.get_path())
+	var ally_health := ally.get_node("Health")
+	ally_health.died.connect(_on_ally_died)
 
 
 func _build_ui() -> void:
@@ -114,11 +129,11 @@ func _spawn_enemy() -> void:
 
 func _pick_enemy_scene() -> PackedScene:
 	var roll := randf()
-	if roll < 0.42:
-		return COLLEAGUE
-	elif roll < 0.62:
+	if roll < 0.45:
+		return VRM_COLLEAGUE
+	elif roll < 0.65:
 		return BSOD
-	elif roll < 0.8:
+	elif roll < 0.83:
 		return ERROR
 	return BLISS
 
@@ -139,6 +154,15 @@ func _on_player_damaged(_amount: int, _hit: Dictionary) -> void:
 func _on_player_died(_hit: Dictionary) -> void:
 	_running = false
 	_show_banner("TERMINATED", "you were always the error message", 3.0)
+	await get_tree().create_timer(2.8).timeout
+	get_tree().reload_current_scene()
+
+
+func _on_ally_died(_hit: Dictionary) -> void:
+	if not _running:
+		return
+	_running = false
+	_show_banner("SHE DIDN'T WAKE UP", "some people stay logged in forever", 3.0)
 	await get_tree().create_timer(2.8).timeout
 	get_tree().reload_current_scene()
 

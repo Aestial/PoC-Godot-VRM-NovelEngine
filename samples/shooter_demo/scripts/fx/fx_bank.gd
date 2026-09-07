@@ -129,3 +129,33 @@ static func popup(parent: Node, position: Vector3, text: String, color: Color) -
 	tween.tween_property(label, "global_position:y", position.y + 0.6, 0.8).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	tween.tween_method(func(a: float) -> void: label.modulate = Color(color.r, color.g, color.b, a), 1.0, 0.0, 0.8)
 	tween.chain().tween_callback(label.queue_free)
+
+
+## One-shot plasma/blood burst at a wound. Parented to a target node so it
+## follows moving bodies (the target usually parents particles locally).
+static func plasma_burst(parent: Node, world_pos: Vector3, world_normal: Vector3, color: Color) -> void:
+	if parent == null or not parent.is_inside_tree():
+		return
+	var particles := CPUParticles3D.new()
+	particles.one_shot = true
+	particles.emitting = true
+	particles.amount = 16
+	particles.lifetime = 0.8
+	particles.explosiveness = 1.0
+	particles.direction = world_normal.normalized()
+	particles.spread = 55.0
+	particles.initial_velocity_min = 1.2
+	particles.initial_velocity_max = 2.6
+	particles.gravity = Vector3(0, -5.0, 0)
+	particles.scale_amount_min = 0.02
+	particles.scale_amount_max = 0.05
+	var mat := StandardMaterial3D.new()
+	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	mat.albedo_color = Color(color.r, color.g, color.b, 0.9)
+	particles.material_override = mat
+	parent.add_child(particles)
+	particles.global_position = world_pos
+	var tween := particles.create_tween()
+	tween.tween_interval(1.2)
+	tween.tween_callback(particles.queue_free)

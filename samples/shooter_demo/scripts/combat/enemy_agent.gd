@@ -50,16 +50,24 @@ func _physics_process(delta: float) -> void:
 
 
 func _resolve_player() -> void:
-	if _player != null and is_instance_valid(_player):
-		return
-	if not player_path.is_empty():
-		_player = get_node_or_null(player_path)
-	else:
-		# Fallback: the first PLAYER-typed ControllableCharacter around.
-		for node in get_tree().get_nodes_in_group("ControllableCharacter"):
-			if node is NovelCharacter and (node as NovelCharacter).character_type == NovelCharacter.CharacterType.PLAYER:
-				_player = node as Node3D
-				break
+	# Pick the nearest living victim: the player or the wounded ally (Allies).
+	var player := get_node_or_null(player_path) if not player_path.is_empty() else null
+	var best: Node3D = player as Node3D
+	var best_dist := INF
+	if best and is_instance_valid(best):
+		best_dist = best.global_position.distance_to(global_position)
+	for ally in get_tree().get_nodes_in_group("Allies"):
+		var node := ally as Node3D
+		if node == null or not is_instance_valid(node):
+			continue
+		var ally_health := node.get_node_or_null("Health")
+		if ally_health and ally_health.get("is_dead"):
+			continue
+		var d := node.global_position.distance_to(global_position)
+		if d < best_dist:
+			best_dist = d
+			best = node
+	_player = best
 
 
 func _attack_player() -> void:
